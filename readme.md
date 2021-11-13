@@ -45,6 +45,100 @@
    ```
 
 4. 创建maven：使用settings引入本地仓库
+    1. 搭建webapp模板
+    
+5. 搭建项目结构
+    
+    main/java  main/resources src/test
+    
+6. 导入pom依赖
+    
+       <dependency>
+             <groupId>junit</groupId>
+             <artifactId>junit</artifactId>
+             <version>4.12</version>
+             <scope>test</scope>
+           </dependency>
+    
+       ```xml
+       <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>javax.servlet-api</artifactId>
+         <version>4.0.1</version>
+         <scope>provided</scope>
+       </dependency>
+       
+       <dependency>
+         <groupId>javax.servlet.jsp</groupId>
+         <artifactId>jsp-api</artifactId>
+         <version>2.1.3-b06</version>
+         <scope>provided</scope>
+       </dependency>
+       
+       <dependency>
+         <groupId>org.mybatis</groupId>
+         <artifactId>mybatis</artifactId>
+         <version>3.4.5</version>
+       </dependency>
+       
+       <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>jstl</artifactId>
+         <version>1.2</version>
+       </dependency>
+       
+       <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-core</artifactId>
+         <version>2.0.1</version>
+       </dependency>
+       
+       <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-databind</artifactId>
+         <version>2.0.0</version>
+       </dependency>
+       
+       <dependency>
+             <groupId>mysql</groupId>
+             <artifactId>mysql-connector-java</artifactId>
+             <version>8.0.26</version>
+           </dependency>
+       </dependency>
+       
+       <dependency>
+         <groupId>log4j</groupId>
+         <artifactId>log4j</artifactId>
+         <version>1.2.17</version>
+       </dependency>
+       ```
+    
+       正常得设置 .properties 和 .xml的扫描声明，我直接写到resources下 就不用加声明了
+    
+       我自己的mysql是8的所以这个 mysql 连接依赖得改版本
+    
+    > 这里学习的项目是ssm，Mybatis主配置文件是单独出来的，这里我改为spring集成，直接写到spring配置文件中，只保留一个applicationContext.xml文件，配置文件太多看着闹心
+    
+    **创建数据库**
+    
+    数据库名：crm_01
+    
+    字符集：utf-8
+    
+    **前端**
+    
+    将前端原型拷贝到webapp下
+    
+    **服务器**
+    
+    使用Tomcat服务器
+    
+    设置热部署 并且 修改Tomcat名称
+    
+    URL：http://localhost:8080/CRM_01/
+    
+
+    
 
     
 
