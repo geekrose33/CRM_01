@@ -4,6 +4,13 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+<!--    处理视图解析器-->
+   <!-- <bean id="resolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/"/>
+        <property name="suffix" value="*.jsp"/>
+    </bean>-->
+
+
 <!--    注解扫描-->
     <context:component-scan base-package="com.geekrose"/>
 <!--    引入外部数据库源信息-->
@@ -12,7 +19,7 @@
 <!--    配置Mybatis的数据源信息-->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
         <property name="url" value="${jdbc.url}"/>
-        <property name="driver" value="${jdbc.driver}"/>
+        <property name="driverClassName" value="${jdbc.driver}"/>
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
     </bean>
@@ -27,7 +34,7 @@
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 <!--        将sqlSessionFactory注入-->
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryBean"/>
-        <property name="basePackage" value="com.geekrose.dao"/>
+        <property name="basePackage" value="com.geekrose.crm.settings.dao"/>
     </bean>
 
 </beans>
