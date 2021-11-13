@@ -150,6 +150,17 @@
   * 市场活动模块：activity
 
 * 工具包utils
+
+  * UUID：生成32位随机串
+  * DateTime：日期
+  * MD5：加密算法
+  * PrintJson：解析json串
+
+* 搭建用户相关的domain、dao、service、controller
+
+* 对于dao 层命名的说明：
+
+  
     
 
     
