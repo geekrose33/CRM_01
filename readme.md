@@ -166,3 +166,93 @@
     
 
 ### 三、登录模块
+关乎登录
+验证账号和密码
+select count(*) from tbl_user where LoginAct=? and LoginPwd = ?
+* 查询记录为0 表示没查到
+* 查询记录为1 表示符合
+* 查询记录大于1 有垃圾数据
+
+执行sql语句 返回 User对象
+
+* 如果User对象为空：账号密码错误
+* 如果不为空：只能说明账号密码正确 需要继续向下验证字段信息
+从User中get expireTime 验证失效时间 lockState 锁定状态 allowips 验证浏览器端的ip地址是否有效
+
+验证失效时间
+
+打印失效时间字段expireTime，和当前时间比较
+
+代码：
+````
+// 失效时间
+@Test
+public void testExpireDate(){
+    Date date = new Date();
+    System.out.println(date);
+    // Sat Nov 13 22:37:43 CST 2021
+    
+    // 将当前时间按照指定格式进行输出
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    String dateFormat = sdf.format(date);
+    System.out.println(dateFormat);
+    // 2021-11-13 22:37:43
+}
+````
+验证失效时间借助字符串方法comepareTo
+
+该方法返回值：
+
+* 大于0：调用方法的字符串数值大于方法内的字符串数值
+* 小于0：调用方法的字符串数值小于方法内的字符串数值
+* 等于0：字符串内数值相等
+
+代码：
+
+```java
+// 获取当前系统时间 （使用工具包）
+String currentTime = DateTimeUtil.getSysTime();
+
+String expireTime = "2012-11-13 22:41:29";
+int i = expireTime.compareTo(currentTime);
+// i > 0 -> expireTime > currentTime 未失效
+// i < 0 -> expireTime < expireTime 失效
+System.out.println(i);
+```
+
+验证是否锁定
+
+```java
+String lockState = "0";
+// 字符串写前面 不会空指针
+if ("0".equals(lockState)){
+    System.out.println("账号已锁定");
+}else {
+    System.out.println("pass");
+}
+```
+
+验证ip地址
+
+```java
+String ip = "192.168.1.10";
+String allIps = "192.168.1.10,192.168.5.21";
+if (allIps.contains(ip)){
+    System.out.println("有效的ip");
+}else {
+    System.out.println("无效的ip");
+}
+```
+
+验证密码MD5加密
+
+```java
+String pwd = "123";
+pwd = MD5Util.getMD5(pwd);
+System.out.println(pwd);
+// 202cb962ac59075b964b07152d234b70
+```
+
+
+
+
