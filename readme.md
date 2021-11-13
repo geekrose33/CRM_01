@@ -137,7 +137,19 @@
     
     URL：http://localhost:8080/CRM_01/
     
+**CRM模块划分**
 
+* 系统设置模块（settings）
+
+  * 用户模块：登录
+
+    设计到数据字典模块信息的查询
+
+* 工作台（workbench）
+
+  * 市场活动模块：activity
+
+* 工具包utils
     
 
     

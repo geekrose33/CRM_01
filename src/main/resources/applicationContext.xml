@@ -27,7 +27,7 @@
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 <!--        将sqlSessionFactory注入-->
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryBean"/>
-        <property name="basePackage" value="com.geekrose.dao"/>
+        <property name="basePackage" value="com.geekrose.crm.settings.dao"/>
     </bean>
 
 </beans>
