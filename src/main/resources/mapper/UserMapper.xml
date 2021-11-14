@@ -185,4 +185,30 @@
       editBy = #{editby,jdbcType=VARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
+
+
+
+<!--  验证登录-->
+  <select id="selectUserByActAndPwd" resultType="com.geekrose.crm.settings.domain.User">
+    select
+      loginAct,
+      name,
+      loginPwd,
+      email,
+      expireTime,
+      lockState,
+      deptno,
+      allowIps,
+      createTime,
+      createBy,
+      editTime,
+      editBy
+    from tbl_user
+    where loginAct = #{user} and loginPwd = #{pass}
+  </select>
+
+  <select id="selectCountByActAndPwd" resultType="java.lang.Integer">
+    select count(*) from tbl_user where loginAct = #{user} and loginPwd = #{pass}
+  </select>
+
 </mapper>

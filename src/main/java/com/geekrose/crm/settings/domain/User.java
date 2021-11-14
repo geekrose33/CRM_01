@@ -15,6 +15,25 @@ public class User {
             从User中get expireTime 验证失效时间 lockState 锁定状态 allowips 验证浏览器端的ip地址是否有效
     */
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", loginact='" + loginact + '\'' +
+                ", name='" + name + '\'' +
+                ", loginpwd='" + loginpwd + '\'' +
+                ", email='" + email + '\'' +
+                ", expiretime='" + expiretime + '\'' +
+                ", lockstate='" + lockstate + '\'' +
+                ", deptno='" + deptno + '\'' +
+                ", allowips='" + allowips + '\'' +
+                ", createtime='" + createtime + '\'' +
+                ", createby='" + createby + '\'' +
+                ", edittime='" + edittime + '\'' +
+                ", editby='" + editby + '\'' +
+                '}';
+    }
+
     private String id; // 主键
 
     private String loginact; // 登录账号

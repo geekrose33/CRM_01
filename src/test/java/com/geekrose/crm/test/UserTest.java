@@ -1,9 +1,18 @@
 package com.geekrose.crm.test;
 
+import com.geekrose.crm.exception.login.LoginException;
+import com.geekrose.crm.settings.dao.UserMapper;
+import com.geekrose.crm.settings.domain.User;
+import com.geekrose.crm.settings.service.UserService;
+import com.geekrose.crm.settings.web.controller.UserController;
 import com.geekrose.crm.utils.DateTimeUtil;
 import com.geekrose.crm.utils.MD5Util;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -71,6 +80,30 @@ public class UserTest {
         pwd = MD5Util.getMD5(pwd);
         System.out.println(pwd);
         // 202cb962ac59075b964b07152d234b70
+    }
+
+    @Test
+    public void testDao(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        UserMapper dao = context.getBean("userMapper", UserMapper.class);
+//        User user = dao.selectUserByActAndPwd("zs", MD5Util.getMD5("123"));
+        Integer integer = dao.selectCountByActAndPwd("zs", MD5Util.getMD5("123"));
+        System.out.println(integer);
+    }
+    @Test
+    public void testService() throws LoginException {
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        UserService service = context.getBean("userService", UserService.class);
+        User user = service.checkLogin("ls", MD5Util.getMD5("123"), "192.168.1.1");
+        System.out.println(user);
+    }
+    @Test
+    public void testController() throws LoginException {
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        UserController controller = context.getBean("userController", UserController.class);
+        ModelAndView mv = controller.doCheckLogin(null, "ls", MD5Util.getMD5("123"), "192.168.1.1");
+        System.out.println(mv);
+
     }
 
 }
