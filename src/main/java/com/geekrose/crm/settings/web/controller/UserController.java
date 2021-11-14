@@ -4,13 +4,19 @@ import com.geekrose.crm.exception.login.LoginException;
 import com.geekrose.crm.exception.login.NameAndPassException;
 import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.settings.service.UserService;
+
+import com.geekrose.crm.settings.vo.Info;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
+
 
 import javax.annotation.Resource;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 
 /**
  * @author Joker_Dong
@@ -23,26 +29,31 @@ public class UserController {
     @Resource
     private UserService service;
 
-    @RequestMapping("/login.do")
-    public ModelAndView doCheckLogin(HttpServletRequest request,String loginAct, String loginPwd) throws LoginException {
-        ModelAndView mv = new ModelAndView();
+    // 用于验证登录
+    @RequestMapping(value = "/login.do",method = {RequestMethod.POST})
+    @ResponseBody
+    public Info doCheckLogin(HttpServletRequest request, HttpSession session , String loginAct, String loginPwd) throws LoginException {
+        Info info = new Info();
+
+        User user = null;
 
         String ip = request.getRemoteAddr();
 
-        User user = service.checkLogin(loginAct,loginPwd,ip);
 
+        user = service.checkLogin(loginAct,loginPwd,ip,info);
+
+        System.out.println(user);
         if (user == null){
-            mv.addObject("success",false);
-            mv.setViewName("forward:/login.jsp");
-            throw new NameAndPassException();
+            info.setSuccess(false);
+
         }else {
-            mv.addObject("success",true);
-            mv.setViewName("forward:/login.jsp");
+            info.setSuccess(true);
+            session.setAttribute("user",user);
         }
-        return mv;
 
 
 
+        return info;
 
     }
 

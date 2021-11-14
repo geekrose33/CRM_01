@@ -82,28 +82,6 @@ public class UserTest {
         // 202cb962ac59075b964b07152d234b70
     }
 
-    @Test
-    public void testDao(){
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        UserMapper dao = context.getBean("userMapper", UserMapper.class);
-//        User user = dao.selectUserByActAndPwd("zs", MD5Util.getMD5("123"));
-        Integer integer = dao.selectCountByActAndPwd("zs", MD5Util.getMD5("123"));
-        System.out.println(integer);
-    }
-    @Test
-    public void testService() throws LoginException {
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        UserService service = context.getBean("userService", UserService.class);
-        User user = service.checkLogin("ls", MD5Util.getMD5("123"), "192.168.1.1");
-        System.out.println(user);
-    }
-    @Test
-    public void testController() throws LoginException {
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        UserController controller = context.getBean("userController", UserController.class);
-        ModelAndView mv = controller.doCheckLogin(null, "ls", MD5Util.getMD5("123"), "192.168.1.1");
-        System.out.println(mv);
 
-    }
 
 }
