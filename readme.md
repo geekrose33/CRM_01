@@ -1,8 +1,8 @@
 # CRM_readme
 
-搭建maven项目
+使用的技术：maven git
 
-前端原型：搭建的html
+前端原型：搭建的html页面
 
 前端：Bootstrap（UI）+ jQuery
 
@@ -12,7 +12,7 @@
 
 服务器：Tomcat
 
-插件：自动补全 统计图表EChars
+插件：自动补全 统计图表EChars Mybatis逆向工程的插件等
 
 
 
@@ -273,6 +273,81 @@ System.out.println(pwd);
 
    * 这里使用ajax传递用户名密码
    * 统一异常处理 自定义的异常（抛出异常时传递异常信息）
+
+4. 这里本来想使用SpringMVC自带的拦截器，但是不好使，百度之后改了一些也不行
+
+   就放弃了，用的原生的过滤器Filter
+
+### 四、市场活动
+
+1. 时长活动表的设计
+
+   建表：
+
+   ​	tbl_activity 市场活动表
+
+   ​	tbl_activity_remark 市场活动备注表
+
+   ​	一对多的关系
+
+2. 市场活动的创建和修改都是以模态窗口的形式展现
+
+出现的问题：
+
+​	当我们重启服务器后，如果我们刷新页面会重新进入登录界面，但是如果我们点击市场活动或者其他导航栏按钮，就会出现只有工作区变成登录页面，很丑...
+
+
+解决方案：
+
+在登录页加入代码（js中）
+
+```javascript
+if (window.top != window ){
+   window.location.top = window.location;
+}
+```
+
+
+
+**创建工作台的组件**
+
+项目结构：crm / workbench / 
+
+这里的dao、domain、mapper.xml我直接用Mybatis逆向工程生成了（tbl_activity tbl_activity_remark）
+
+主配置文件记得把注解扫描添加一下
+
+**展现市场活动的模态窗口**
+
+这里data-toggle="modal" 表示触发事件 打开模态窗口
+data-target="#createActivityModal" 表示具体打开哪个模态窗口 根据#id
+由于这里占用了两个属性，如果要添加操作在事件上加不了 被写死了
+所以改为使用jQuery完成
+
+> 这里要为按钮设置id
+>
+> id的设置需要一定约束，每个公司 项目都不一样
+>
+> 这里设置：
+>
+> add / create 表示打开模态窗口 跳转到添加页
+>
+> save 执行添加操作
+>
+> edit 跳转到修改页 或者打开修改操作的模态窗口
+>
+> update 执行修改操作
+>
+> get 执行查询操作 find / select / query / .. 也可以
+>
+> 特殊操作： login 等
+
+添加模态窗口
+
+​	需要操作的模态窗口的jquery对象调用modal()方法 传入参数
+
+* show 打开模态窗口
+* hide 隐藏模态窗口
 
    
 
