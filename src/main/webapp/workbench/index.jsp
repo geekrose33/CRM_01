@@ -1,16 +1,17 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
 <%
-String path = request.getScheme() + "://" + request.getServerName() + ":" +
-request.getServerPort() + request.getContextPath() + "/";
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<base href="<%=path%>">
 <meta charset="UTF-8">
+<base href="<%=basePath%>"/>
 <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+
 <script type="text/javascript">
 
 	//页面加载完毕
@@ -43,7 +44,6 @@ request.getServerPort() + request.getContextPath() + "/";
 	});
 	
 </script>
-
 </head>
 <body>
 	
@@ -139,7 +139,7 @@ request.getServerPort() + request.getContextPath() + "/";
 	
 	<!-- 顶部 -->
 	<div id="top" style="height: 50px; background-color: #3C3C3C; width: 100%;">
-		<div style="position: absolute; top: 5px; left: 0px; font-size: 30px; font-weight: 400; color: white; font-family: 'times new roman'">CRM &nbsp;<span style="font-size: 12px;">&copy;2017&nbsp;动力节点</span></div>
+		<div style="position: absolute; top: 5px; left: 0px; font-size: 30px; font-weight: 400; color: white; font-family: 'times new roman'">CRM &nbsp;<span style="font-size: 12px;">&copy;2021&nbsp;GeekRose</span></div>
 		<div style="position: absolute; top: 15px; right: 15px;">
 			<ul>
 				<li class="dropdown user-dropdown">
@@ -169,12 +169,12 @@ request.getServerPort() + request.getContextPath() + "/";
 				<li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-tag"></span> 动态</a></li>
 				<li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-time"></span> 审批</a></li>
 				<li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> 客户公海</a></li>
-				<li class="liClass"><a href="activity/index.html" target="workareaFrame"><span class="glyphicon glyphicon-play-circle"></span> 市场活动</a></li>
-				<li class="liClass"><a href="clue/index.html" target="workareaFrame"><span class="glyphicon glyphicon-search"></span> 线索（潜在客户）</a></li>
-				<li class="liClass"><a href="customer/index.html" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> 客户</a></li>
-				<li class="liClass"><a href="contacts/index.html" target="workareaFrame"><span class="glyphicon glyphicon-earphone"></span> 联系人</a></li>
-				<li class="liClass"><a href="transaction/index.html" target="workareaFrame"><span class="glyphicon glyphicon-usd"></span> 交易（商机）</a></li>
-				<li class="liClass"><a href="visit/index.html" target="workareaFrame"><span class="glyphicon glyphicon-phone-alt"></span> 售后回访</a></li>
+				<li class="liClass"><a href="workbench/activity/index.jsp" target="workareaFrame"><span class="glyphicon glyphicon-play-circle"></span> 市场活动</a></li>
+				<li class="liClass"><a href="workbench/clue/index.html" target="workareaFrame"><span class="glyphicon glyphicon-search"></span> 线索（潜在客户）</a></li>
+				<li class="liClass"><a href="workbench/customer/index.html" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> 客户</a></li>
+				<li class="liClass"><a href="workbench/contacts/index.html" target="workareaFrame"><span class="glyphicon glyphicon-earphone"></span> 联系人</a></li>
+				<li class="liClass"><a href="workbench/transaction/index.html" target="workareaFrame"><span class="glyphicon glyphicon-usd"></span> 交易（商机）</a></li>
+				<li class="liClass"><a href="workbench/visit/index.html" target="workareaFrame"><span class="glyphicon glyphicon-phone-alt"></span> 售后回访</a></li>
 				<li class="liClass">
 					<a href="#no2" class="collapsed" data-toggle="collapse"><span class="glyphicon glyphicon-stats"></span> 统计图表</a>
 					<ul id="no2" class="nav nav-pills nav-stacked collapse">

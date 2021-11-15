@@ -13,6 +13,9 @@
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 	$(function () {
+		if (window.top != window ){
+			window.location.top = window.location;
+		}
 		// 加载页面第一件事 给用户名加焦点
 		// 并且将用户名中内容清空
 		$("#loginAct").val("");
