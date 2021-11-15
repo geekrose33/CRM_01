@@ -19,15 +19,88 @@
 <script type="text/javascript">
 
 	$(function(){
+
 		
 		$("#addBtn").click(function () {
+
+			// 加入Bootstrap为我们提供的时间控件
+			// 这里我们使用的是.class选择器 因为除了开始时间还要对结束时间添加
+			$(".time").datetimepicker({
+				minView: "month",
+				language:  'zh-CN',
+				format: 'yyyy-mm-dd',
+				autoclose: true,
+				todayBtn: true,
+				pickerPosition: "bottom-left"
+			});
+
+
 			// alert(123);
-			// 打开模态窗口 方法：modal()   属性：show / hide
-			$("#createActivityModal").modal("show");
+			// 走后台 打开模态窗口前将user表数据加到所有者下拉列表中
+			$.ajax({
+				url:"workbench/activity/getUserList.do",
+				type:"get",
+				dataType:"json",
+				success:function (data) {
+					// 获取List<User>
+					// data {{user1},{user2},...}
+					var html = "<option></option>";
+					// 遍历出来的每一个value 即 user对象
+					$.each(data,function (index,val) {
+						// 给用户显示的是姓名 保存的是Id
+						html += "<option value='"+val.id+"'>" + val.name + "</option>"
+					})
+					$("#create-marketActivityOwner").html(html);
+
+					// 将所有人默认为当前登录用户的名字
+					// $("#xxx").val(这里参数使用对应下拉option的value值)
+					var uid = '${user.id}';
+					<%--'${user.id}'--%>
+					$("#create-marketActivityOwner").val(uid);
+
+					// 打开模态窗口 方法：modal()   属性：show / hide
+					$("#createActivityModal").modal("show");
+				}
+			});
 
 
 		})
-		
+
+		// 为保存按钮添加事件 执行添加操作
+		$("#saveBtn").click(function () {
+			$.ajax({
+				url:"workbench/activity/saveActivity.do",
+				data:{
+					"owner":$.trim($("#create-marketActivityOwner").val()),
+					"name":$.trim($("#create-marketActivityName").val()),
+					"startdate":$.trim($("#create-startTime").val()),
+					"enddate":$.trim($("#create-endTime").val()),
+					"cost":$.trim($("#create-cost").val()),
+					"description":$.trim($("#create-describe").val())
+				},
+				dataType:"json",
+				type:"post",
+				// contentType:"application/json",
+				success:function (data) {
+					// 添加修改删除使用post 登录验证的查询使用post 剩下的使用get
+					// data {"success":true / false}
+					if (data.success){
+						// 添加成功
+						// 刷新市场活动列表 局部刷新
+
+
+						// 关闭添加操作的模态窗口
+						$("#createActivityModal").modal("hide");
+					}else{
+						// 添加失败
+
+
+
+					}
+				}
+			})
+		})
+
 	});
 	
 </script>
@@ -52,9 +125,7 @@
 							<label for="create-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-marketActivityOwner">
-								  <option>zhangsan</option>
-								  <option>lisi</option>
-								  <option>wangwu</option>
+
 								</select>
 							</div>
                             <label for="create-marketActivityName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
@@ -62,15 +133,15 @@
                                 <input type="text" class="form-control" id="create-marketActivityName">
                             </div>
 						</div>
-						
+<%--						为了防止输入的数据不是按照格式要求 将日期输入框设置为只读--%>
 						<div class="form-group">
 							<label for="create-startTime" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-startTime">
+								<input type="text" class="form-control time" id="create-startTime" <%--readonly--%>>
 							</div>
 							<label for="create-endTime" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-endTime">
+								<input type="text" class="form-control time " id="create-endTime" <%--readonly--%>>
 							</div>
 						</div>
                         <div class="form-group">
@@ -90,9 +161,13 @@
 					</form>
 					
 				</div>
+<%--				data-dismiss="modal" 表示关闭模态窗口
+					为保存按钮添加时间 执行操作
+
+--%>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">保存</button>
+					<button type="button" class="btn btn-primary" id="saveBtn">保存</button>
 				</div>
 			</div>
 		</div>

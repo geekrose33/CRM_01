@@ -14,7 +14,7 @@
 <script type="text/javascript">
 	$(function () {
 		if (window.top != window ){
-			window.location.top = window.location;
+			window.top.location = window.location;
 		}
 		// 加载页面第一件事 给用户名加焦点
 		// 并且将用户名中内容清空

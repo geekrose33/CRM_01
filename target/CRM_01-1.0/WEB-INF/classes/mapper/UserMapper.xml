@@ -191,6 +191,7 @@
 <!--  验证登录-->
   <select id="selectUserByActAndPwd" resultType="com.geekrose.crm.settings.domain.User">
     select
+      id,
       loginAct,
       name,
       loginPwd,

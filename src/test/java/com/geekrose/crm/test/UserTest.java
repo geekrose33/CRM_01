@@ -25,6 +25,10 @@ public class UserTest {
     @Test
     public void testLogin(){
 
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        UserMapper dao = context.getBean("userMapper", UserMapper.class);
+        User user = dao.selectUserByActAndPwd("we", MD5Util.getMD5("123"));
+        System.out.println(user);
 
     }
     // 失效时间
@@ -76,7 +80,7 @@ public class UserTest {
 
     @Test
     public void testMD5(){
-        String pwd = "123";
+        String pwd = "20211115";
         pwd = MD5Util.getMD5(pwd);
         System.out.println(pwd);
         // 202cb962ac59075b964b07152d234b70

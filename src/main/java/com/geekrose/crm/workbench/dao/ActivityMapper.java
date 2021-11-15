@@ -1,6 +1,9 @@
 package com.geekrose.crm.workbench.dao;
 
+import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.workbench.domain.Activity;
+
+import java.util.List;
 
 public interface ActivityMapper {
     int deleteByPrimaryKey(String id);
@@ -14,4 +17,8 @@ public interface ActivityMapper {
     int updateByPrimaryKeySelective(Activity record);
 
     int updateByPrimaryKey(Activity record);
+
+    List<User> selectUserList();
+
+//    Integer saveActivity(Activity activity);
 }

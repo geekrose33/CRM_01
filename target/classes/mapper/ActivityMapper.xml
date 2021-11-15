@@ -161,4 +161,14 @@
       editBy = #{editby,jdbcType=VARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
+
+
+
+  <select id="selectUserList" resultType="com.geekrose.crm.settings.domain.User">
+    select * from tbl_user
+  </select>
+
+
+
+
 </mapper>
