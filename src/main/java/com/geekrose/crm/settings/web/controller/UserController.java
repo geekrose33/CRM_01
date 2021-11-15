@@ -42,10 +42,8 @@ public class UserController {
 
         user = service.checkLogin(loginAct,loginPwd,ip,info);
 
-        System.out.println(user);
         if (user == null){
             info.setSuccess(false);
-
         }else {
             info.setSuccess(true);
             session.setAttribute("user",user);

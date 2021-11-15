@@ -3,26 +3,37 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
+<!--    设置欢迎页-->
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+<!--    配置监听器-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath*:applicationContext.xml</param-value>
+    </context-param>
+
     <servlet>
         <servlet-name>DispatcherServlet</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <!--        在Tomcat容器启动时就创建SpringMVC的容器-->
-        <load-on-startup>1</load-on-startup>
         <!--        告诉容器配置文件位置-->
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>classpath*:applicationContext.xml</param-value>
+            <param-value>classpath*:springmvc.xml</param-value>
         </init-param>
+        <!--        在Tomcat容器启动时就创建SpringMVC的容器-->
+        <load-on-startup>1</load-on-startup>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>DispatcherServlet</servlet-name>
         <url-pattern>*.do</url-pattern>
     </servlet-mapping>
-    
+
+
+<!--    SpringMVC自带的过滤器-->
     <filter>
         <filter-name>CharacterEncodingFilter</filter-name>
         <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -44,4 +55,17 @@
         <filter-name>CharacterEncodingFilter</filter-name>
         <url-pattern>*.do</url-pattern>
     </filter-mapping>
+
+<!--    自定义过滤器-->
+    <filter>
+        <filter-name>WebFilter_Login</filter-name>
+        <filter-class>com.geekrose.crm.web.filter.WebFilter_Login</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>WebFilter_Login</filter-name>
+        <url-pattern>*.do</url-pattern>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
+
+
 </web-app>
