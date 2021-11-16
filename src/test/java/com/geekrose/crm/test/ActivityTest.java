@@ -2,14 +2,17 @@ package com.geekrose.crm.test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.geekrose.crm.settings.dao.UserMapper;
 import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.workbench.dao.ActivityMapper;
+import com.geekrose.crm.workbench.dao.ActivityRemarkMapper;
 import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.service.ActivityService;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,7 +25,7 @@ public class ActivityTest {
     @Test
     public void testGetUsers(){
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        ActivityMapper dao = context.getBean("activityMapper", ActivityMapper.class);
+        UserMapper dao = context.getBean("userMapper", UserMapper.class);
         List<User> users = dao.selectUserList();
         for (User user : users) {
             System.out.println(user);
@@ -76,4 +79,22 @@ public class ActivityTest {
         Integer integer = service.searchTotalCount();
         System.out.println(integer);
     }
+
+    @Test
+    public void testDeleteActivities(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ActivityRemarkMapper dao = context.getBean("activityRemarkMapper", ActivityRemarkMapper.class);
+        Integer num = dao.selectCountByAids(new String[]{"20e0120f0f334a44a906027a82012bde"/*,"1f12250bb5c440d3aaf32723345e0b9b"*/});
+        System.out.println(num);
+    }
+    @Test
+    public void testArray(){
+        String[] ids = new String[5];
+        ids[0] = "111";
+        ids[1] = "222";
+        ids[2] = "333";
+        System.out.println(Arrays.toString(ids));
+    }
+
+
 }

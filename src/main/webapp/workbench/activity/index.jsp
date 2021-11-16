@@ -157,11 +157,62 @@
 				$(需要绑定元素的有效的外层元素).on(绑定事件的方式，需要绑定的元素的jquery对象，回调函数)
 		*/
 		$("#activityBody").on("click",$("input[name=xz]"),function () {
-			$("#checkbox-all").prop("checked",$("input[name=xz]").length==$("input[name=xz]:checked").length);
+			$("#checkbox-all").prop("checked",$("input[name=xz]").length==$("input[name=xz]:checked").length );
 		})
 
-	});
+		// 实现删除按钮
+		// 参数为选择的id 这里参数id key值重复 不能使用json格式
+		// 这里使用字符串拼接
+		$("#deleteBtn").click(function () {
+			// 这里获取的是jquery对象 不能直接获取其值 需要转为dom对象
+			var $ones = $("input[name=xz]:checked");
+			if ($ones.length == 0){
+				alert("请选择要删除的记录");
+			}else {
+				if (confirm("你确定要删除？")){
+					var param = "";
 
+					for (var i = 0; i < $ones.length; i++) {
+						param += "id=" + $($ones[i]).val();
+						if (i < $ones.length-1){
+							param += "&";
+						}
+
+					}
+
+					$.ajax({
+						url:"workbench/activity/deleteActivites.do",
+						data:param,
+						type:"post",
+						dataType:"json",
+						success:function (data) {
+							// 回馈一个删除成功的标识即可
+							if (data.success){
+								//删除成功
+								pageList(1,5);
+
+							}else {
+								// 删除失败
+
+
+
+							}
+
+
+
+						}
+					})
+				}
+
+			}
+
+
+
+		})
+
+
+
+	});
 
 
 
@@ -173,6 +224,10 @@
 	    4. 下方分页查询
 	*/
 	function pageList(pageNo,pageSize) {
+		// 每次刷新都将全选框的√干掉
+		$("#checkbox-all").prop("checked",false);
+
+
 		$("#search-name").val($.trim($("#hidden-name").val()));
 		$("#search-owner").val($.trim($("#hidden-owner").val()));
 		$("#search-startTime").val($.trim($("#hidden-startDate").val()));
@@ -431,7 +486,7 @@
 					-->
 				  <button type="button" class="btn btn-primary" id="addBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button type="button" class="btn btn-danger" id="deleteBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				
 			</div>

@@ -14,4 +14,8 @@ public interface ActivityRemarkMapper {
     int updateByPrimaryKeySelective(ActivityRemark record);
 
     int updateByPrimaryKey(ActivityRemark record);
+
+    Integer selectCountByAids(String[] ids);
+
+    Integer deleteByAids(String[] ids);
 }

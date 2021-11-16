@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -81,6 +82,18 @@ public class ActivityController {
         response.getWriter().print(json);
 
 
+    }
+    @RequestMapping("/deleteActivites.do")
+    public void doDeleteActivites(HttpServletResponse response,HttpServletRequest request) throws IOException {
+        String ids[] = request.getParameterValues("id");
+        System.out.println(Arrays.toString(ids));
+
+        boolean flag = service.deleteActivities(ids);
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success",flag);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
     }
 
 }

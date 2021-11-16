@@ -1,9 +1,11 @@
 package com.geekrose.crm.workbench.service.impl;
 
+import com.geekrose.crm.settings.dao.UserMapper;
 import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.utils.DateTimeUtil;
 import com.geekrose.crm.utils.UUIDUtil;
 import com.geekrose.crm.workbench.dao.ActivityMapper;
+import com.geekrose.crm.workbench.dao.ActivityRemarkMapper;
 import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.service.ActivityService;
 import org.springframework.stereotype.Service;
@@ -20,11 +22,17 @@ import java.util.UUID;
 @Service(value = "activityService")
 public class ActivityServiceImpl implements ActivityService {
     @Resource
-    private ActivityMapper dao;
+    private ActivityMapper actDao;
+
+    @Resource
+    private ActivityRemarkMapper remDao;
+
+    @Resource
+    private UserMapper userDao;
 
 
     public List<User> getUserList() {
-        List<User> users = dao.selectUserList();
+        List<User> users = userDao.selectUserList();
         return users;
     }
 
@@ -35,7 +43,7 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setCreatetime(DateTimeUtil.getSysTime());
 
 
-        int num = dao.insertSelective(activity);
+        int num = actDao.insertSelective(activity);
         if (num == 1){
             return true;
         }
@@ -48,7 +56,7 @@ public class ActivityServiceImpl implements ActivityService {
         Integer pageNoInt = Integer.valueOf(pageNo);
         Integer pageSizeInt = Integer.valueOf(pageSize);
         Integer skipCount = (pageNoInt - 1)* pageSizeInt;
-        List<Activity> list = dao.selectActivitiesByPage(skipCount,pageSizeInt,activity);
+        List<Activity> list = actDao.selectActivitiesByPage(skipCount,pageSizeInt,activity);
         // 将所有的owner 根据user表换为姓名
         /*List<String> owners = new ArrayList<String>();
         for (Activity act : list) {
@@ -69,7 +77,26 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     public Integer searchTotalCount() {
-        Integer totalCount = dao.selectTotalCount();
+        Integer totalCount = actDao.selectTotalCount();
         return totalCount;
+    }
+
+    public boolean deleteActivities(String[] ids) {
+        boolean flag = true;
+        // 除了删除市场活动还要删除市场活动备注
+        Integer count1 = remDao.selectCountByAids(ids);
+
+        Integer count2 = remDao.deleteByAids(ids);
+
+        if (count1 != count2){
+            flag = false;
+        }
+
+
+        Integer count3 = actDao.deleteInKeys(ids);
+        if (count3 == ids.length){
+            return true;
+        }
+        return flag;
     }
 }

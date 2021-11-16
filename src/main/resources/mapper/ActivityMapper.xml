@@ -67,6 +67,19 @@
     delete from tbl_activity
     where id = #{id,jdbcType=CHAR}
   </delete>
+
+
+  <delete id="deleteInKeys">
+    delete from tbl_activity
+    where id in
+    <foreach collection="array" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </delete>
+
+
+
+
   <insert id="insert" parameterType="com.geekrose.crm.workbench.domain.Activity">
     insert into tbl_activity (id, owner, name, startDate, 
       endDate, cost, description, 
@@ -203,9 +216,7 @@
 
 
 
-  <select id="selectUserList" resultType="com.geekrose.crm.settings.domain.User">
-    select * from tbl_user
-  </select>
+
 
 
 

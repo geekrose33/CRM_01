@@ -13,4 +13,7 @@ public interface ActivityService {
     List<Activity> searchPageList(String pageNo, String pageSize,Activity activity);
 
     Integer searchTotalCount();
+
+    boolean deleteActivities(String[] ids);
+
 }

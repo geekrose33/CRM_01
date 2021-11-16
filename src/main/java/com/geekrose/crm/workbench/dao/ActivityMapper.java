@@ -19,11 +19,13 @@ public interface ActivityMapper {
 
     int updateByPrimaryKey(Activity record);
 
-    List<User> selectUserList();
+//    List<User> selectUserList();
 
     List<Activity> selectActivitiesByPage(@Param("skipCount") Integer skipCount,@Param("pageSize") Integer pageSize,@Param("act") Activity activity);
 
     Integer selectTotalCount();
+
+    Integer deleteInKeys(String[] ids);
 
 //    List<User> selectUserById(List<String> owners);
 
