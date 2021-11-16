@@ -22,6 +22,37 @@ public class Activity {
     private String edittime; // 修改时间
 
     private String editby; // 修改人
+    public Activity(){}
+    public Activity(String id, String owner, String name, String startdate, String enddate, String cost, String description, String createtime, String createby, String edittime, String editby) {
+        this.id = id;
+        this.owner = owner;
+        this.name = name;
+        this.startdate = startdate;
+        this.enddate = enddate;
+        this.cost = cost;
+        this.description = description;
+        this.createtime = createtime;
+        this.createby = createby;
+        this.edittime = edittime;
+        this.editby = editby;
+    }
+
+    @Override
+    public String toString() {
+        return "Activity{" +
+                "id='" + id + '\'' +
+                ", owner='" + owner + '\'' +
+                ", name='" + name + '\'' +
+                ", startdate='" + startdate + '\'' +
+                ", enddate='" + enddate + '\'' +
+                ", cost='" + cost + '\'' +
+                ", description='" + description + '\'' +
+                ", createtime='" + createtime + '\'' +
+                ", createby='" + createby + '\'' +
+                ", edittime='" + edittime + '\'' +
+                ", editby='" + editby + '\'' +
+                '}';
+    }
 
     public String getId() {
         return id;

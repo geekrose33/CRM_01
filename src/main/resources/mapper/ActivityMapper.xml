@@ -24,6 +24,45 @@
     from tbl_activity
     where id = #{id,jdbcType=CHAR}
   </select>
+
+
+<!--  分页查询-->
+  <!--  将查到的activity中owner换为user.name-->
+  <select id="selectActivitiesByPage" resultType="com.geekrose.crm.workbench.domain.Activity">
+
+    select a.id, u.name as owner, a.name, a.startDate,
+      a.endDate, a.cost, a.description,
+      a.createTime, a.createBy, a.editTime,
+      a.editBy
+      from tbl_activity a inner join tbl_user u
+      on a.owner = u.id
+      <where>
+        <if test="act.name != null and act.name !=''">
+          and a.name like '%' #{act.name} '%'
+        </if>
+        <if test="act.owner != null and act.owner !=''">
+          and u.name like '%' #{act.owner} '%'
+        </if>
+        <if test="act.startdate != null and act.startdate !=''">
+          and a.startdate &gt; #{act.startdate}
+        </if>
+        <if test="act.enddate != null and act.enddate !=''">
+          and a.enddate &lt; #{act.enddate}
+        </if>
+      </where>
+      order by a.createTime desc
+      limit #{skipCount},#{pageSize}
+
+  </select>
+
+  <select id="selectTotalCount" resultType="java.lang.Integer">
+    select count(*) from tbl_activity
+  </select>
+
+
+
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_activity
     where id = #{id,jdbcType=CHAR}

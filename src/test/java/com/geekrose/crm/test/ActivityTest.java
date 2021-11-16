@@ -51,4 +51,29 @@ public class ActivityTest {
         boolean b = service.saveActivity(new Activity());
         System.out.println(b);
     }
+    @Test
+    public void testSearchActivitiesDao(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ActivityMapper dao = context.getBean("activityMapper", ActivityMapper.class);
+        List<Activity> list = dao.selectActivitiesByPage(2, 2, new Activity());
+        for (Activity activity : list) {
+            System.out.println(activity);
+        }
+    }
+    @Test
+    public void testSearchActivitiesService(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ActivityService service = context.getBean("activityService", ActivityService.class);
+        List<Activity> list = service.searchPageList("1","2",new Activity());
+        for (Activity activity : list) {
+            System.out.println(activity);
+        }
+    }
+    @Test
+    public void testSelectCount(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ActivityService service = context.getBean("activityService", ActivityService.class);
+        Integer integer = service.searchTotalCount();
+        System.out.println(integer);
+    }
 }

@@ -10,15 +10,20 @@
 <meta charset="UTF-8">
 <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="jquery/bs_pagination/jquery.bs_pagination.min.css">
 
 <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+<%--引入分页插件--%>
+<script type="text/javascript" src="jquery/bs_pagination/en.js"></script>
+<script type="text/javascript" src="jquery/bs_pagination/jquery.bs_pagination.min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
 
 <script type="text/javascript">
 
 	$(function(){
+
 
 		
 		$("#addBtn").click(function () {
@@ -64,7 +69,7 @@
 			});
 
 
-		})
+		});
 
 		// 为保存按钮添加事件 执行添加操作
 		$("#saveBtn").click(function () {
@@ -89,8 +94,19 @@
 						// 刷新市场活动列表 局部刷新
 
 
+                        // 清除添加操作的数据
+                        /*
+                            当jquery的form表单对象 提交数据时 有submit()方法
+                            此时进行重置 idea提示有reset()方法 注意：jQuery没有为我们提供reset
+                            但是原生js有reset方法，我们将jquery对象改为dom即可
+                            jquery -> dom ：数组下标
+                            dom -> jquery ：$(dom)
+                        */
+                        $("#activityAddForm")[0].reset();
+
 						// 关闭添加操作的模态窗口
 						$("#createActivityModal").modal("hide");
+						pageList(1,5);
 					}else{
 						// 添加失败
 
@@ -99,13 +115,132 @@
 					}
 				}
 			})
+		});
+
+		$("#searchBtn").click(function () {
+			/*$.ajax({
+				url:"workbench/activity/searchActivties.do",
+				data:{
+					"name":$.trim($("#search-name").val()),
+					"owner":$.trim($("#search-owner").val()),
+					"startdate":$.trim($("#search-startTime").val()),
+					"enddate":$.trim($("#search-endTime").val()),
+				},
+				dataType:"get",
+				type:"json",
+				success:function (data) {
+
+				}
+			})*/
+
+			/*
+				解决输入框内输入数据后 点击下方分页按照输入框查询的bug
+				将输入框内的数据在点击查询后保存到隐藏域中
+				在分页查询时使用的是隐藏域的数据
+			*/
+			$("#hidden-name").val($.trim($("#search-name").val()));
+			$("#hidden-owner").val($.trim($("#search-owner").val()));
+			$("#hidden-startDate").val($.trim($("#search-startTime").val()));
+			$("#hidden-endDate").val($.trim($("#search-endTime").val()));
+			pageList(1,5);
+		});
+
+		// 每一次加载都要刷新一次列表
+		pageList(1,5);
+		$("#checkbox-all").click(function () {
+			$("input[name=xz]").prop("checked",this.checked);
+		});
+
+		/*
+			动态生成的元素，我们要以on的方式触发事件 不能用普通绑定事件的方式
+			语法：
+				$(需要绑定元素的有效的外层元素).on(绑定事件的方式，需要绑定的元素的jquery对象，回调函数)
+		*/
+		$("#activityBody").on("click",$("input[name=xz]"),function () {
+			$("#checkbox-all").prop("checked",$("input[name=xz]").length==$("input[name=xz]:checked").length);
 		})
 
 	});
+
+
+
+
+	/*
+	    刷新需要的地方：
+	    1. 点击市场活动
+	    2. 增删改
+	    3. 上方条件查询
+	    4. 下方分页查询
+	*/
+	function pageList(pageNo,pageSize) {
+		$("#search-name").val($.trim($("#hidden-name").val()));
+		$("#search-owner").val($.trim($("#hidden-owner").val()));
+		$("#search-startTime").val($.trim($("#hidden-startDate").val()));
+		$("#search-endTime").val($.trim($("#hidden-endDate").val()));
+        $.ajax({
+            url:"workbench/activity/pageList.do",
+            data:{
+                "pageNo":pageNo,
+                "pageSize":pageSize,
+                "name":$.trim($("#search-name").val()),
+                "owner":$.trim($("#search-owner").val()),
+                "startdate":$.trim($("#search-startTime").val()),
+                "enddate":$.trim($("#search-endTime").val())
+            },
+            type:"get",// 正常的查询数据直接用get
+            dataType:"json",
+            success:function (data) {
+                /*
+                    这里的data包含两部分
+                    1. total 总记录数
+                    2. activityList 活动的集合
+                */
+                var html = "";
+                $.each(data.activityList  ,function (index,value) {
+                    html += '<tr class="active">';
+                    html += '<td><input type="checkbox" name="xz" value="' + value.id + '" /></td>';
+                    html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.jsp\';">' + value.name + '</a></td>';
+                    html += '<td>' + value.owner + '</td>';
+                    html += '<td>' + value.startdate + '</td>';
+                    html += '<td>' + value.enddate + '</td>';
+                    html += '</tr>';
+                })
+				$("#activityBody").html(html);
+
+                // 数据处理完毕后 对前端展现分页相关信息
+				// 计算总页数
+				var totalPages = data.totalCount % pageSize === 0 ? data.totalCount / pageSize : parseInt(data.totalCount / pageSize) + 1;
+				$("#activityPage").bs_pagination({
+					currentPage: pageNo, // 页码
+					rowsPerPage: pageSize, // 每页显示的记录条数
+					maxRowsPerPage: 20, // 每页最多显示的记录条数
+					totalPages: totalPages, // 总页数
+					totalRows: data.total, // 总记录条数
+
+					visiblePageLinks: 5, // 显示几个卡片
+
+					showGoToPage: true,
+					showRowsPerPage: true,
+					showRowsInfo: true,
+					showRowsDefaultInfo: true,
+
+					onChangePage : function(event, data){
+						pageList(data.currentPage , data.rowsPerPage);
+					}
+				});
+            }
+        })
+    }
 	
 </script>
 </head>
 <body>
+<%--	隐藏域中存储条件查询中的数据--%>
+	<input type="hidden" id="hidden-name"/>
+	<input type="hidden" id="hidden-owner"/>
+	<input type="hidden" id="hidden-startDate"/>
+	<input type="hidden" id="hidden-endDate"/>
+
 
 	<!-- 创建市场活动的模态窗口 -->
 	<div class="modal fade" id="createActivityModal" role="dialog">
@@ -119,7 +254,7 @@
 				</div>
 				<div class="modal-body">
 				
-					<form class="form-horizontal" role="form">
+					<form class="form-horizontal" role="form" id="activityAddForm">
 					
 						<div class="form-group">
 							<label for="create-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
@@ -257,14 +392,14 @@
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">名称</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-name">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">所有者</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-owner">
 				    </div>
 				  </div>
 
@@ -272,17 +407,17 @@
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">开始日期</div>
-					  <input class="form-control" type="text" id="startTime" />
+					  <input class="form-control" type="text" id="search-startTime" />
 				    </div>
 				  </div>
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">结束日期</div>
-					  <input class="form-control" type="text" id="endTime">
+					  <input class="form-control" type="text" id="search-endTime">
 				    </div>
 				  </div>
 				  
-				  <button type="submit" class="btn btn-default">查询</button>
+				  <button type="button" id="searchBtn" class="btn btn-default">查询</button>
 				  
 				</form>
 			</div>
@@ -304,15 +439,15 @@
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input type="checkbox" id="checkbox-all"/></td>
 							<td>名称</td>
                             <td>所有者</td>
 							<td>开始日期</td>
 							<td>结束日期</td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr class="active">
+					<tbody id="activityBody">
+						<%--<tr class="active">
 							<td><input type="checkbox" /></td>
 							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/activity/detail.jsp';">发传单</a></td>
                             <td>zhangsan</td>
@@ -325,13 +460,13 @@
                             <td>zhangsan</td>
                             <td>2020-10-10</td>
                             <td>2020-10-20</td>
-                        </tr>
+                        </tr>--%>
 					</tbody>
 				</table>
 			</div>
 			
 			<div style="height: 50px; position: relative;top: 30px;">
-				<div>
+				<%--<div>
 					<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
 				</div>
 				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
@@ -362,7 +497,8 @@
 							<li class="disabled"><a href="#">末页</a></li>
 						</ul>
 					</nav>
-				</div>
+				</div>--%>
+				<div id="activityPage"></div>
 			</div>
 			
 		</div>

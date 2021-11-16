@@ -62,5 +62,25 @@ public class ActivityController {
 //        PrintJson.printJsonFlag(response,success);
     }
 
+    @RequestMapping("/pageList.do")
+    @ResponseBody
+    public void doPageList(HttpServletResponse response,String pageNo,String pageSize,Activity activity) throws IOException {
+
+        // 查询所有记录数返回
+        Integer totalCount = service.searchTotalCount();
+        // 分页查询
+        List<Activity> list = service.searchPageList(pageNo,pageSize,activity);
+        /*for (Activity activity1 : list) {
+            System.out.println(activity1);
+        }*/
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("activityList",list);
+        map.put("totalCount",totalCount);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+
+
+    }
 
 }

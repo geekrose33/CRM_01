@@ -9,4 +9,8 @@ public interface ActivityService {
     List<User> getUserList();
 
     boolean saveActivity(Activity activity);
+    // 分页查询 （动态sql 条件查询）
+    List<Activity> searchPageList(String pageNo, String pageSize,Activity activity);
+
+    Integer searchTotalCount();
 }
