@@ -7,6 +7,7 @@ import com.geekrose.crm.utils.UUIDUtil;
 import com.geekrose.crm.workbench.dao.ActivityMapper;
 import com.geekrose.crm.workbench.dao.ActivityRemarkMapper;
 import com.geekrose.crm.workbench.domain.Activity;
+import com.geekrose.crm.workbench.domain.ActivityRemark;
 import com.geekrose.crm.workbench.service.ActivityService;
 import org.springframework.stereotype.Service;
 
@@ -96,6 +97,46 @@ public class ActivityServiceImpl implements ActivityService {
         Integer count3 = actDao.deleteInKeys(ids);
         if (count3 == ids.length){
             return true;
+        }
+        return flag;
+    }
+
+    public Activity getActivityById(String id) {
+
+        Activity activity = actDao.selectByPrimaryKey(id);
+
+        return activity;
+    }
+
+    public boolean updateAct(Activity activity) {
+
+        activity.setEdittime(DateTimeUtil.getSysTime());
+        int i = actDao.updateByPrimaryKey(activity);
+
+
+        if (i == 1){
+            return true;
+        }
+        return false;
+    }
+
+    public Activity getActDetail(String id) {
+        // 这里owner不是id 是关联表的姓名
+        Activity act = actDao.selectActDetailById(id);
+
+        return act;
+    }
+
+    public List<ActivityRemark> getRemarkList(String actId) {
+        List<ActivityRemark> list = remDao.selectRemarksByActId(actId);
+        return list;
+    }
+
+    public boolean deleteActRemark(String id) {
+        boolean flag = false;
+        int i = remDao.deleteByPrimaryKey(id);
+        if (i==1){
+            flag = true;
         }
         return flag;
     }

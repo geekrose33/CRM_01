@@ -33,6 +33,14 @@
 
   </select>
 
+
+<!--  根据市场活动外键查询备注信息-->
+  <select id="selectRemarksByActId" resultType="com.geekrose.crm.workbench.domain.ActivityRemark">
+    select <include refid="Base_Column_List"/>
+    from tbl_activity_remark
+    where activityId = #{actId}
+  </select>
+
 <!--  根据市场互动外键 删除备注信息-->
   <delete id="deleteByAids">
     delete from tbl_activity_remark where activityId in

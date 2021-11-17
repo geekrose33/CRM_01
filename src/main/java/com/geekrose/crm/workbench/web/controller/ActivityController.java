@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.utils.PrintJson;
 import com.geekrose.crm.workbench.domain.Activity;
+import com.geekrose.crm.workbench.domain.ActivityRemark;
 import com.geekrose.crm.workbench.service.ActivityService;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapper;
 import org.springframework.stereotype.Controller;
@@ -86,8 +87,7 @@ public class ActivityController {
     @RequestMapping("/deleteActivites.do")
     public void doDeleteActivites(HttpServletResponse response,HttpServletRequest request) throws IOException {
         String ids[] = request.getParameterValues("id");
-        System.out.println(Arrays.toString(ids));
-
+        
         boolean flag = service.deleteActivities(ids);
         ObjectMapper mapper = new ObjectMapper();
         HashMap<String, Boolean> map = new HashMap<String, Boolean>();
@@ -95,5 +95,69 @@ public class ActivityController {
         String json = mapper.writeValueAsString(map);
         response.getWriter().print(json);
     }
+
+    @RequestMapping("/getUserListAndActivity.do")
+    public void doGetUserListAndActivity(HttpServletResponse response,String id) throws IOException {
+
+        // getUserList
+        List<User> users = service.getUserList();
+
+        // getActivity
+        Activity act = service.getActivityById(id);
+
+        // 通过jackson改为json数据 通过response传输
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("users",users);
+        map.put("act",act);
+        String jsons = mapper.writeValueAsString(map);
+        response.getWriter().print(jsons);
+
+    }
+
+    @RequestMapping("/updateAct.do")
+    public void doUpdateAct(HttpServletRequest request,HttpServletResponse response,Activity activity) throws IOException {
+        boolean success = false;
+        User user =(User) request.getSession().getAttribute("user");
+        activity.setEditby(user.getName());
+        success =service.updateAct(activity);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+
+    }
+
+    @RequestMapping("/detailAct.do")
+    public ModelAndView doDetailAct(String id){
+        ModelAndView mv = new ModelAndView();
+        Activity act = service.getActDetail(id);
+        mv.addObject("act",act);
+        mv.setViewName("/workbench/activity/detail.jsp");
+        return mv;
+    }
+
+    @RequestMapping("/getRemarkList.do")
+    @ResponseBody
+    public List<ActivityRemark> doGetRemarkList(String id){
+
+        List<ActivityRemark> list = service.getRemarkList(id);
+
+        return list;
+    }
+
+    @RequestMapping("/deleteRemark.do")
+    public void doDeleteRemark(HttpServletResponse response,String id) throws IOException {
+        boolean flag = false;
+        flag = service.deleteActRemark(id);
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success", flag);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+    }
+
 
 }

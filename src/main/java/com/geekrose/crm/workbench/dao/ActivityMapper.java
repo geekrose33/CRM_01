@@ -27,6 +27,8 @@ public interface ActivityMapper {
 
     Integer deleteInKeys(String[] ids);
 
+    Activity selectActDetailById(String id);
+
 //    List<User> selectUserById(List<String> owners);
 
 //    Integer saveActivity(Activity activity);

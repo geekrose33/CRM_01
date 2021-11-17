@@ -2,6 +2,8 @@ package com.geekrose.crm.workbench.dao;
 
 import com.geekrose.crm.workbench.domain.ActivityRemark;
 
+import java.util.List;
+
 public interface ActivityRemarkMapper {
     int deleteByPrimaryKey(String id);
 
@@ -18,4 +20,6 @@ public interface ActivityRemarkMapper {
     Integer selectCountByAids(String[] ids);
 
     Integer deleteByAids(String[] ids);
+
+    List<ActivityRemark> selectRemarksByActId(String actId);
 }

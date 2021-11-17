@@ -2,6 +2,7 @@ package com.geekrose.crm.workbench.service;
 
 import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.workbench.domain.Activity;
+import com.geekrose.crm.workbench.domain.ActivityRemark;
 
 import java.util.List;
 
@@ -16,4 +17,13 @@ public interface ActivityService {
 
     boolean deleteActivities(String[] ids);
 
+    Activity getActivityById(String id);
+
+    boolean updateAct(Activity activity);
+
+    Activity getActDetail(String id);
+
+    List<ActivityRemark> getRemarkList(String actId);
+
+    boolean deleteActRemark(String id);
 }

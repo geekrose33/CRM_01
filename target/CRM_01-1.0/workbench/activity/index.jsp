@@ -23,21 +23,21 @@
 <script type="text/javascript">
 
 	$(function(){
+		// 加入Bootstrap为我们提供的时间控件
+		// 这里我们使用的是.class选择器 因为除了开始时间还要对结束时间添加
 
-
+		$(".time").datetimepicker({
+			minView: "month",
+			language:  'zh-CN',
+			format: 'yyyy-mm-dd',
+			autoclose: true,
+			todayBtn: true,
+			pickerPosition: "bottom-left"
+		});
 		
 		$("#addBtn").click(function () {
 
-			// 加入Bootstrap为我们提供的时间控件
-			// 这里我们使用的是.class选择器 因为除了开始时间还要对结束时间添加
-			$(".time").datetimepicker({
-				minView: "month",
-				language:  'zh-CN',
-				format: 'yyyy-mm-dd',
-				autoclose: true,
-				todayBtn: true,
-				pickerPosition: "bottom-left"
-			});
+
 
 
 			// alert(123);
@@ -106,7 +106,10 @@
 
 						// 关闭添加操作的模态窗口
 						$("#createActivityModal").modal("hide");
-						pageList(1,5);
+						// pageList(1,5);
+
+						// 添加操作后也是跳转到第一页 维持每页记录数
+						pageList(1,$("#activityPage").bs_pagination('getOption', 'rowsPerPage'));
 					}else{
 						// 添加失败
 
@@ -189,8 +192,9 @@
 							// 回馈一个删除成功的标识即可
 							if (data.success){
 								//删除成功
-								pageList(1,5);
-
+								// pageList(1,5);
+								// 删除操作后 返回第一页 维持每页记录数
+								pageList(1,$("#activityPage").bs_pagination('getOption', 'rowsPerPage'));
 							}else {
 								// 删除失败
 
@@ -210,7 +214,90 @@
 
 		})
 
+		// 实现修改按钮
+		$("#editBtn").click(function () {
+			var $ones = $("input[name=xz]:checked");
 
+			if ($ones.length === 0){
+				alert("请选择你要删除的市场活动");
+			}else if ($ones.length > 1){
+				alert("指定修改的市场活动不能大于1")
+			}else {
+				// 剩余情况就是市场活动数量为1
+				var id = $ones.val();
+				$.ajax({
+					url:"workbench/activity/getUserListAndActivity.do",
+					data:{
+						"id":id
+					},
+					dataType:"json",
+					type:"get",
+					success:function (data) {
+						/*
+                            一共获取两个数据 UserList 和 要修改的Activity
+                        */
+						// userList
+						var html = "";
+
+						$.each(data.users,function (index,value) {
+							html += "<option value='"+value.id+"'>" + value.name + "</option>";
+						});
+
+						$("#edit-marketActivityOwner").html(html);
+
+						$("#edit-marketActivityName").val(data.act.name);
+						$("#edit-startTime").val(data.act.startdate);
+						$("#edit-endTime").val(data.act.enddate);
+						$("#edit-cost").val(data.act.cost);
+						$("#edit-describe").val(data.act.description);
+
+						$("#editActivityModal").modal("show");
+					}
+				})
+
+			}
+
+		})
+
+		// 更新操作的提交
+		$("#updateBtn").click(function () {
+			var $ones = $("input[name=xz]:checked");
+			var id = $ones.val();
+			$.ajax({
+				url:"workbench/activity/updateAct.do",
+				data:{
+					"id":id,
+					"owner":$.trim($("#edit-marketActivityOwner").val()),
+					"name":$.trim($("#edit-marketActivityName").val()),
+					"startdate":$.trim($("#edit-startTime").val()),
+					"enddate":$.trim($("#edit-endTime").val()),
+					"cost":$.trim($("#edit-cost").val()),
+					"description":$.trim($("#edit-describe").val())
+				},
+				dataType:"json",
+				type:"post",
+				success:function (data) {
+					// 修改市场活动 判断标识：true / false
+					if (data.success){
+						// 刷新列表
+						// 更新后维持 原有页数和每页记录数
+						// pageList(1,5);
+						pageList($("#activityPage").bs_pagination('getOption', 'currentPage')
+								,$("#activityPage").bs_pagination('getOption', 'rowsPerPage'));
+
+						// 关闭模态窗口
+						$("#editActivityModal").modal("hide");
+					}else {
+						alert("修改市场活动失败");
+					}
+
+
+				}
+
+
+			})
+
+		})
 
 	});
 
@@ -254,7 +341,7 @@
                 $.each(data.activityList  ,function (index,value) {
                     html += '<tr class="active">';
                     html += '<td><input type="checkbox" name="xz" value="' + value.id + '" /></td>';
-                    html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.jsp\';">' + value.name + '</a></td>';
+                    html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detailAct.do?id='+value.id+'\';">' + value.name + '</a></td>';
                     html += '<td>' + value.owner + '</td>';
                     html += '<td>' + value.startdate + '</td>';
                     html += '<td>' + value.enddate + '</td>';
@@ -296,8 +383,72 @@
 	<input type="hidden" id="hidden-startDate"/>
 	<input type="hidden" id="hidden-endDate"/>
 
+<!-- 修改市场活动的模态窗口 -->
+<div class="modal fade" id="editActivityModal" role="dialog">
+	<div class="modal-dialog" role="document" style="width: 85%;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel2">修改市场活动</h4>
+			</div>
+			<div class="modal-body">
 
-	<!-- 创建市场活动的模态窗口 -->
+				<form class="form-horizontal" role="form">
+
+					<div class="form-group">
+						<label for="edit-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
+						<div class="col-sm-10" style="width: 300px;">
+							<select class="form-control" id="edit-marketActivityOwner">
+
+							</select>
+						</div>
+						<label for="edit-marketActivityName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
+						<div class="col-sm-10" style="width: 300px;">
+							<input type="text" class="form-control" id="edit-marketActivityName">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
+						<div class="col-sm-10" style="width: 300px;">
+							<input type="text" class="form-control time" id="edit-startTime" >
+						</div>
+						<label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
+						<div class="col-sm-10" style="width: 300px;">
+							<input type="text" class="form-control time" id="edit-endTime">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="edit-cost" class="col-sm-2 control-label">成本</label>
+						<div class="col-sm-10" style="width: 300px;">
+							<input type="text" class="form-control" id="edit-cost">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="edit-describe" class="col-sm-2 control-label">描述</label>
+						<div class="col-sm-10" style="width: 81%;">
+<%--							textarea标签虽然是标签对但是获取值和设置值 使用val()方法 （html()方法也能用）--%>
+							<textarea class="form-control" rows="3" id="edit-describe"></textarea>
+						</div>
+					</div>
+
+				</form>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" id="updateBtn">更新</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- 创建市场活动的模态窗口 -->
 	<div class="modal fade" id="createActivityModal" role="dialog">
 		<div class="modal-dialog" role="document" style="width: 85%;">
 			<div class="modal-content">
@@ -362,72 +513,8 @@
 			</div>
 		</div>
 	</div>
-	
-	<!-- 修改市场活动的模态窗口 -->
-	<div class="modal fade" id="editActivityModal" role="dialog">
-		<div class="modal-dialog" role="document" style="width: 85%;">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">
-						<span aria-hidden="true">×</span>
-					</button>
-					<h4 class="modal-title" id="myModalLabel2">修改市场活动</h4>
-				</div>
-				<div class="modal-body">
-				
-					<form class="form-horizontal" role="form">
-					
-						<div class="form-group">
-							<label for="edit-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
-							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="edit-marketActivityOwner">
-								  <option>zhangsan</option>
-								  <option>lisi</option>
-								  <option>wangwu</option>
-								</select>
-							</div>
-                            <label for="edit-marketActivityName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
-                            <div class="col-sm-10" style="width: 300px;">
-                                <input type="text" class="form-control" id="edit-marketActivityName" value="发传单">
-                            </div>
-						</div>
 
-						<div class="form-group">
-							<label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
-							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-startTime" value="2020-10-10">
-							</div>
-							<label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
-							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-endTime" value="2020-10-20">
-							</div>
-						</div>
-						
-						<div class="form-group">
-							<label for="edit-cost" class="col-sm-2 control-label">成本</label>
-							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-cost" value="5,000">
-							</div>
-						</div>
-						
-						<div class="form-group">
-							<label for="edit-describe" class="col-sm-2 control-label">描述</label>
-							<div class="col-sm-10" style="width: 81%;">
-								<textarea class="form-control" rows="3" id="edit-describe">市场活动Marketing，是指品牌主办或参与的展览会议与公关市场活动，包括自行主办的各类研讨会、客户交流会、演示会、新产品发布会、体验会、答谢会、年会和出席参加并布展或演讲的展览会、研讨会、行业交流会、颁奖典礼等</textarea>
-							</div>
-						</div>
-						
-					</form>
-					
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	
+
 	
 	
 	
@@ -485,7 +572,7 @@
 						所以改为使用jQuery完成
 					-->
 				  <button type="button" class="btn btn-primary" id="addBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
+				  <button type="button" class="btn btn-default" id="editBtn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
 				  <button type="button" class="btn btn-danger" id="deleteBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				

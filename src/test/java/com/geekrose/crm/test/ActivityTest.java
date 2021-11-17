@@ -7,6 +7,7 @@ import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.workbench.dao.ActivityMapper;
 import com.geekrose.crm.workbench.dao.ActivityRemarkMapper;
 import com.geekrose.crm.workbench.domain.Activity;
+import com.geekrose.crm.workbench.domain.ActivityRemark;
 import com.geekrose.crm.workbench.service.ActivityService;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -94,6 +95,25 @@ public class ActivityTest {
         ids[1] = "222";
         ids[2] = "333";
         System.out.println(Arrays.toString(ids));
+    }
+
+    @Test
+    public void testSelectAct(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ActivityService service = context.getBean("activityService", ActivityService.class);
+        Activity act = service.getActDetail("933a7278ba504da789d9746cd8a735e6");
+        System.out.println(act);
+
+    }
+
+    @Test
+    public void testGetRemarksByActId(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ActivityService service = context.getBean("activityService", ActivityService.class);
+        List<ActivityRemark> list = service.getRemarkList("6af873baf3ac447ea30f920e86768a83");
+        for (ActivityRemark remark : list) {
+            System.out.println(remark);
+        }
     }
 
 

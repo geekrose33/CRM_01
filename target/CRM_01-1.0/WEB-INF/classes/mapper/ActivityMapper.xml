@@ -26,6 +26,15 @@
   </select>
 
 
+  <select id="selectActDetailById" resultType="com.geekrose.crm.workbench.domain.Activity">
+    select
+    a.id, u.name as owner, a.name, a.startDate, a.endDate, a.cost, a.description, a.createTime, a.createBy, a.editTime,
+    a.editBy
+    from tbl_activity a inner join tbl_user u
+    on a.owner = u.id
+    where a.id = #{id}
+  </select>
+
 <!--  分页查询-->
   <!--  将查到的activity中owner换为user.name-->
   <select id="selectActivitiesByPage" resultType="com.geekrose.crm.workbench.domain.Activity">
@@ -166,39 +175,42 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.geekrose.crm.workbench.domain.Activity">
     update tbl_activity
     <set>
-      <if test="owner != null">
+      <if test="owner != null and owner != ''">
         owner = #{owner,jdbcType=CHAR},
       </if>
-      <if test="name != null">
+      <if test="name != null and owner != ''">
         name = #{name,jdbcType=VARCHAR},
       </if>
-      <if test="startdate != null">
+      <if test="startdate != null and owner != ''">
         startDate = #{startdate,jdbcType=CHAR},
       </if>
-      <if test="enddate != null">
+      <if test="enddate != null and owner != ''">
         endDate = #{enddate,jdbcType=CHAR},
       </if>
-      <if test="cost != null">
+      <if test="cost != null and owner != ''">
         cost = #{cost,jdbcType=VARCHAR},
       </if>
-      <if test="description != null">
+      <if test="description != null and owner != ''">
         description = #{description,jdbcType=VARCHAR},
       </if>
-      <if test="createtime != null">
+      <if test="createtime != null and owner != ''">
         createTime = #{createtime,jdbcType=CHAR},
       </if>
-      <if test="createby != null">
+      <if test="createby != null and owner != ''">
         createBy = #{createby,jdbcType=VARCHAR},
       </if>
-      <if test="edittime != null">
+      <if test="edittime != null and owner != ''">
         editTime = #{edittime,jdbcType=CHAR},
       </if>
-      <if test="editby != null">
+      <if test="editby != null and owner != ''">
         editBy = #{editby,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
+
+
+
   <update id="updateByPrimaryKey" parameterType="com.geekrose.crm.workbench.domain.Activity">
     update tbl_activity
     set owner = #{owner,jdbcType=CHAR},
@@ -207,8 +219,6 @@
       endDate = #{enddate,jdbcType=CHAR},
       cost = #{cost,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
-      createTime = #{createtime,jdbcType=CHAR},
-      createBy = #{createby,jdbcType=VARCHAR},
       editTime = #{edittime,jdbcType=CHAR},
       editBy = #{editby,jdbcType=VARCHAR}
     where id = #{id,jdbcType=CHAR}
