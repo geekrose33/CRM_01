@@ -116,5 +116,13 @@ public class ActivityTest {
         }
     }
 
+    @Test
+    public void testRemarkInsertAndGet(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ActivityService service = context.getBean("activityService", ActivityService.class);
+        ActivityRemark remark = service.getActivityRemarkById("202111172300");
+        System.out.println(remark);
+
+    }
 
 }

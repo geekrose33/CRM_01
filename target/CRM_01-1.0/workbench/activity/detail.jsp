@@ -55,8 +55,7 @@ request.getServerPort() + request.getContextPath() + "/";
 
 
 
-		// 刷新市场活动备注信息表
-		showRemarkList();
+
 
         $("#remarkBody").on("mouseover",".remarkDiv",function(){
             $(this).children("div").children("div").show();
@@ -64,7 +63,125 @@ request.getServerPort() + request.getContextPath() + "/";
         $("#remarkBody").on("mouseout",".remarkDiv",function(){
             $(this).children("div").children("div").hide();
         })
+
+        // 为添加按钮绑定事件
+        $("#saveBtn").click(function () {
+
+            // 发出ajax请求 添加操作
+            $.ajax({
+                url:"workbench/activity/saveRemark.do",
+                type:"post",
+                dataType:"json",
+                data:{
+                    "notecontent":$.trim($("#remark").val()),
+                    "activityid":"${act.id}"
+                },
+                success:function (data) {
+                    /*
+                        返回两个数据 success: true / false   remark 市场活动备注对象
+                    */
+                    if (data.success){
+                        // 添加成功
+                        // 添加一个div
+                        var html = "";
+
+                        html += '<div id="'+data.remark.id+'" class="remarkDiv" style="height: 60px;">';
+                        html += '<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
+                        html += '<div style="position: relative; top: -40px; left: 40px;" >';
+                        html += '<h5>'+data.remark.notecontent+'</h5>';
+                        html += '<font color="gray">市场活动</font> <font color="gray">-</font> <b>${act.name}</b> <small style="color: gray;"> '+(data.remark.createtime)+' 由 '+(data.remark.createby)+'</small>';
+                        html += '<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">';
+                        html += '<a class="myHref" href="javascript:void(0);" onclick="editRemark(\''+data.remark.id+'\')"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #FF0000;"></span></a>';
+                        html += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                        // javascript:void(0); ---> 禁用超链接
+                        // 动态生成的标签使用方法传参需要加引号 这里由于外层有引号所以内部加引号需要转义
+                        html += '<a class="myHref" href="javascript:void(0);" onclick="deleteRemark(\''+data.remark.id+'\')"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #FF0000;"></span></a>';
+                        html += '</div>';
+                        html += '</div>';
+                        html += '</div>';
+
+                        $("#remarkContent").append(html);
+                        showRemarkList(); 
+                        $("#remark").val("");
+
+
+
+                    }else{
+                        // 添加失败
+                        alert("添加市场活动备注失败");
+                    }
+
+                }
+            })
+
+
+        });
+
+        // 为修改备注按钮绑定事件
+        $("#updateRemarkBtn").click(function () {
+
+            var id = $("#remarkId").val();
+            // alert(id);
+
+            $.ajax({
+                url:"workbench/activity/updateRemark.do",
+                data:{
+                    "id":id,
+                    "noteContent":$.trim($("#noteContent").val())
+                },
+                dataType:"json",
+                type:"post",
+                success:function (data) {
+                    /*
+                        data:
+                            success: true / false
+                            remark: obj
+                                修改时间 修改人 内容
+                    */
+                    if (data.success){
+                        // 修改成功
+                        // 更新备注内容
+                        $("h"+id).html(data.remark.notecontent);
+                        var html = "";
+                        html += data.remark.edittime;
+                        html += " 由 ";
+                        html += data.remark.editby;
+
+                        $("s"+id).val(html);
+
+                        // 关闭模态窗口
+                        $("#editRemarkModal").modal("hide");
+                        // $("#remarkContent").html("");
+                        showRemarkList();
+
+                    }else{
+                        alert("修改市场备注信息失败");
+                    }
+
+                }
+            })
+
+        });
+        // 刷新市场活动备注信息表
+        showRemarkList();
 	});
+
+
+	// 编辑备注
+	function editRemark(id) {
+
+	    // 提前获取数据 id notecontent
+        $("#remarkId").val(id);
+
+        var noteContent = $("#h"+id).html();
+        // alert(noteContent);
+        $("#noteContent").val(noteContent);
+
+	    // 展现模态窗口
+	    $("#editRemarkModal").modal("show");
+
+    }
+    // 刷新备注
 	function showRemarkList() {
 
 		$.ajax({
@@ -82,10 +199,10 @@ request.getServerPort() + request.getContextPath() + "/";
 					html += '<div id="'+value.id+'" class="remarkDiv" style="height: 60px;">';
 					html += '<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
 					html += '<div style="position: relative; top: -40px; left: 40px;" >';
-					html += '<h5>'+value.notecontent+'</h5>';
-					html += '<font color="gray">市场活动</font> <font color="gray">-</font> <b>${act.name}</b> <small style="color: gray;"> '+(value.editflag==="0"?value.createtime:value.edittime)+' 由 '+(value.editflag==="0"?value.createby:value.editby)+'</small>';
+					html += '<h5 id="h'+value.id+'">'+value.notecontent+'</h5>';
+					html += '<font color="gray">市场活动</font> <font color="gray">-</font> <b>${act.name}</b> <small style="color: gray;" id="s'+value.id+'"> '+(value.editflag==="0"?value.createtime:value.edittime)+' 由 '+(value.editflag==="0"?value.createby:value.editby)+'</small>';
 					html += '<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">';
-					html += '<a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #FF0000;"></span></a>';
+					html += '<a class="myHref" href="javascript:void(0);" onclick="editRemark(\''+value.id+'\')"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #FF0000;"></span></a>';
 					html += '&nbsp;&nbsp;&nbsp;&nbsp;';
 					// javascript:void(0); ---> 禁用超链接
                     // 动态生成的标签使用方法传参需要加引号 这里由于外层有引号所以内部加引号需要转义
@@ -97,7 +214,7 @@ request.getServerPort() + request.getContextPath() + "/";
 
 
 
-				$("#remarkDiv").before(html);
+				$("#remarkContent").html(html);
 
 			}
 		})
@@ -323,13 +440,14 @@ request.getServerPort() + request.getContextPath() + "/";
 				</div>
 			</div>
 		</div>--%>
+        <div id="remarkContent"></div>
 		
 		<div id="remarkDiv" style="background-color: #E6E6E6; width: 870px; height: 90px;">
 			<form role="form" style="position: relative;top: 10px; left: 10px;">
 				<textarea id="remark" class="form-control" style="width: 850px; resize : none;" rows="2"  placeholder="添加备注..."></textarea>
 				<p id="cancelAndSaveBtn" style="position: relative;left: 737px; top: 10px; display: none;">
 					<button id="cancelBtn" type="button" class="btn btn-default">取消</button>
-					<button type="button" class="btn btn-primary">保存</button>
+					<button type="button" id="saveBtn" class="btn btn-primary">保存</button>
 				</p>
 			</form>
 		</div>

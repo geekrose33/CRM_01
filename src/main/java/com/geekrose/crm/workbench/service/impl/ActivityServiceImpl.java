@@ -140,4 +140,39 @@ public class ActivityServiceImpl implements ActivityService {
         }
         return flag;
     }
+
+    public boolean saveActivityRemark(String activityid, String notecontent, String id,String createby) {
+        ActivityRemark remark = new ActivityRemark();
+        remark.setActivityid(activityid);
+        remark.setNotecontent(notecontent);
+        remark.setCreatetime(DateTimeUtil.getSysTime());
+        remark.setCreateby(createby);
+        remark.setEditflag("0");
+        remark.setId(id);
+        int i = remDao.insert(remark);
+        if (i==1){
+            return true;
+        }
+        return false;
+    }
+
+    public ActivityRemark getActivityRemarkById(String id) {
+        ActivityRemark remark = remDao.selectByPrimaryKey(id);
+        return remark;
+    }
+
+    public boolean updateRemark(String id, String noteContent,String editby) {
+        boolean flag = false;
+        ActivityRemark remark = new ActivityRemark();
+        remark.setId(id);
+        remark.setNotecontent(noteContent);
+        remark.setEditflag("1");
+        remark.setEditby(editby);
+        remark.setEdittime(DateTimeUtil.getSysTime());
+        int i = remDao.updateByPrimaryKeySelective(remark);
+        if (i==1){
+            flag = true;
+        }
+        return flag;
+    }
 }

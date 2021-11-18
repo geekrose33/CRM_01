@@ -4,7 +4,9 @@ import com.alibaba.druid.support.json.JSONUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geekrose.crm.settings.domain.User;
+import com.geekrose.crm.utils.MD5Util;
 import com.geekrose.crm.utils.PrintJson;
+import com.geekrose.crm.utils.UUIDUtil;
 import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.domain.ActivityRemark;
 import com.geekrose.crm.workbench.service.ActivityService;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -157,6 +160,44 @@ public class ActivityController {
         map.put("success", flag);
         String json = mapper.writeValueAsString(map);
         response.getWriter().print(json);
+    }
+
+    @RequestMapping("/saveRemark.do")
+    public void doSaveRemark(HttpSession session,HttpServletResponse response, String activityid, String notecontent) throws IOException {
+        boolean success = false;
+        String id = MD5Util.getMD5(UUIDUtil.getUUID());
+        // 返回success
+        User user = (User) session.getAttribute("user");
+        String name = user.getName();
+        success = service.saveActivityRemark(activityid,notecontent,id,name);
+        // 返回remark
+        ActivityRemark remark = service.getActivityRemarkById(id);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("success",success);
+        map.put("remark",remark);
+        String jsons = mapper.writeValueAsString(map);
+        response.getWriter().print(jsons);
+
+    }
+
+    @RequestMapping("/updateRemark.do")
+    public void doUpdateRemark(HttpSession session,HttpServletResponse response,String id,String noteContent) throws IOException {
+        boolean success = false;
+        User user =(User) session.getAttribute("user");
+        String editby = user.getName();
+        success = service.updateRemark(id,noteContent,editby);
+
+        ActivityRemark remark = service.getActivityRemarkById(id);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("success",success);
+        map.put("remark",remark);
+        String jsons = mapper.writeValueAsString(map);
+        response.getWriter().print(jsons);
+
     }
 
 
