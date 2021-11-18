@@ -349,6 +349,55 @@ data-target="#createActivityModal" 表示具体打开哪个模态窗口 根据#i
 * show 打开模态窗口
 * hide 隐藏模态窗口
 
+### 五、核心业务搭建
+
+1. 线索模块
+
+   * tbl_clue 线索表
+   * tbl_clue_remark 线索备注表
+   * tbl_clue_activity_relation 线索和市场活动关联关系表
+
+2. 客户模块
+
+   * tbl_customer 客户表
+   * tbl_customer_remark 客户备注表
+
+3. 联系人相关表
+
+   * tbl_contacts 联系人表
+   * tbl_contacts_remark 联系人备注表
+   * tbl_contacts_activity_relation 联系人和市场活动关联关系表
+
+4. 交易模块
+
+   * tbl_tran 交易表
+   * tbl_tran_remark 交易备注表
+   * tbl_tran_history 交易历史表
+
+5. 数据字典相关表
+
+   * tbl_dic_type 字典类型表
+   * tbl_dic_value 字典值表
+
+6. 将线索 客户 联系人 交易模块的html修改为jsp 解决404
+
+7. 搭建线索、客户、联系人、交易 domain dao service controller
+
+8. 解析crm中的多对多关系
+
+   实际项目开发中，基本上半数以上的需求，都是一对多，或者多对一的关系。
+
+   以上关系我们存在一种很特殊的关系，一对一的关系 
+
+   不论是一对多 还是 多对一 还是一对一，我们都是在其中一张表建立外键（多）来维护表与表之间的关系
+
+   多对多关系：人和职业，一个人可以有多份职业，一个职业可以由多个人去做
+
+   
+
+9. cache（缓存机制）解决数据字典存储问题
+
+   关键代码
    
 
 

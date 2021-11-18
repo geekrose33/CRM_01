@@ -39,7 +39,7 @@
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
         <!-- 数据库表名及对应的 Java 模型类名 -->
-        <table tableName="tbl_activity_remark" domainObjectName="ActivityRemark"
+        <table tableName="tbl_tran_remark" domainObjectName="TranRemark"
                enableCountByExample="false"
                enableUpdateByExample="false"
                enableDeleteByExample="false"

@@ -101,7 +101,7 @@ request.getServerPort() + request.getContextPath() + "/";
                         html += '</div>';
 
                         $("#remarkContent").append(html);
-                        showRemarkList(); 
+                        showRemarkList();
                         $("#remark").val("");
 
 
