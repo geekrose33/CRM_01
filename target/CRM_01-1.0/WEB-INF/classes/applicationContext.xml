@@ -5,7 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
 <!--    注解扫描-->
-    <context:component-scan base-package="com.geekrose.crm.settings,com.geekrose.crm.workbench"/>
+    <context:component-scan base-package="com.geekrose.crm.settings,com.geekrose.crm.workbench,com.geekrose.crm.web.listener"/>
 <!--    引入外部数据库源信息-->
     <context:property-placeholder location="classpath*:jdbc.properties"/>
 
@@ -21,7 +21,9 @@
     <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mapperLocations" value="classpath*:mapper/*.xml"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
     </bean>
+
 
 <!--    声明代理dao-->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">

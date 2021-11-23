@@ -187,7 +187,7 @@
   </update>
 
   <select id="selectUserList" resultType="com.geekrose.crm.settings.domain.User">
-    select * from tbl_user
+    select <include refid="Base_Column_List"/> from tbl_user
   </select>
 
 <!--  验证登录-->

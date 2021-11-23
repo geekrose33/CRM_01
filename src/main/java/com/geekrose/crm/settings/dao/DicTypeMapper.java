@@ -2,6 +2,8 @@ package com.geekrose.crm.settings.dao;
 
 import com.geekrose.crm.settings.domain.DicType;
 
+import java.util.List;
+
 public interface DicTypeMapper {
     int deleteByPrimaryKey(String code);
 
@@ -14,4 +16,6 @@ public interface DicTypeMapper {
     int updateByPrimaryKeySelective(DicType record);
 
     int updateByPrimaryKey(DicType record);
+
+    List<DicType> getTypeList();
 }

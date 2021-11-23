@@ -7,7 +7,44 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+
+    <!--    SpringMVC自带的过滤器-->
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceRequestEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceResponseEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>*.do</url-pattern>
+    </filter-mapping>
+
+    <!--    自定义过滤器-->
+    <filter>
+        <filter-name>WebFilter_Login</filter-name>
+        <filter-class>com.geekrose.crm.web.filter.WebFilter_Login</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>WebFilter_Login</filter-name>
+        <url-pattern>*.do</url-pattern>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
+
+
 <!--    配置监听器-->
+
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
@@ -15,6 +52,14 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath*:applicationContext.xml</param-value>
     </context-param>
+
+<!--    配置加载数据字典的监听器-->
+    <!--<listener>
+        <listener-class>com.geekrose.crm.web.listener.SysInitListener</listener-class>
+    </listener>-->
+
+<!--    配置日志-->
+
 
     <servlet>
         <servlet-name>DispatcherServlet</servlet-name>
@@ -32,40 +77,6 @@
         <url-pattern>*.do</url-pattern>
     </servlet-mapping>
 
-
-<!--    SpringMVC自带的过滤器-->
-    <filter>
-        <filter-name>CharacterEncodingFilter</filter-name>
-        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-        <init-param>
-            <param-name>encoding</param-name>
-            <param-value>utf-8</param-value>
-        </init-param>
-        <init-param>
-            <param-name>forceRequestEncoding</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <init-param>
-            <param-name>forceResponseEncoding</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </filter>
-    
-    <filter-mapping>
-        <filter-name>CharacterEncodingFilter</filter-name>
-        <url-pattern>*.do</url-pattern>
-    </filter-mapping>
-
-<!--    自定义过滤器-->
-    <filter>
-        <filter-name>WebFilter_Login</filter-name>
-        <filter-class>com.geekrose.crm.web.filter.WebFilter_Login</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>WebFilter_Login</filter-name>
-        <url-pattern>*.do</url-pattern>
-        <url-pattern>*.jsp</url-pattern>
-    </filter-mapping>
 
 
 </web-app>

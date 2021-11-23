@@ -37,6 +37,19 @@
       <version>1.2</version>
     </dependency>
 
+<!--    日志信息-->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.2</version>
+    </dependency>
+
     <!-- Jackson springMVC默认的Json解决方案选择是 Jackson，所以只需要导入jackson的jar，即可使用。-->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -56,13 +69,6 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>8.0.26</version>
     </dependency>
-
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
-    </dependency>
-
 
 <!--    mybatis-->
     <dependency>
@@ -96,6 +102,11 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
       <version>5.3.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>5.3.13</version>
     </dependency>
     <!--spring测试-->
     <dependency>
