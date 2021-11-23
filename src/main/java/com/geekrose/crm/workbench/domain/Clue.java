@@ -1,7 +1,7 @@
 package com.geekrose.crm.workbench.domain;
 
 public class Clue {
-    private String id;
+    private String id; // 1
 
     private String fullname;
 
@@ -25,13 +25,13 @@ public class Clue {
 
     private String source;
 
-    private String createby;
+    private String createby; // 1
 
-    private String createtime;
+    private String createtime; // 1
 
-    private String editby;
+    private String editby; // 2
 
-    private String edittime;
+    private String edittime; // 2
 
     private String description;
 
@@ -40,6 +40,32 @@ public class Clue {
     private String nextcontacttime;
 
     private String address;
+
+    @Override
+    public String toString() {
+        return "Clue{" +
+                "id='" + id + '\'' +
+                ", fullname='" + fullname + '\'' +
+                ", appellation='" + appellation + '\'' +
+                ", owner='" + owner + '\'' +
+                ", company='" + company + '\'' +
+                ", job='" + job + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", website='" + website + '\'' +
+                ", mphone='" + mphone + '\'' +
+                ", state='" + state + '\'' +
+                ", source='" + source + '\'' +
+                ", createby='" + createby + '\'' +
+                ", createtime='" + createtime + '\'' +
+                ", editby='" + editby + '\'' +
+                ", edittime='" + edittime + '\'' +
+                ", description='" + description + '\'' +
+                ", contactsummary='" + contactsummary + '\'' +
+                ", nextcontacttime='" + nextcontacttime + '\'' +
+                ", address='" + address + '\'' +
+                '}';
+    }
 
     public String getId() {
         return id;

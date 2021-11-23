@@ -346,7 +346,7 @@
                     html += '<td>' + value.startdate + '</td>';
                     html += '<td>' + value.enddate + '</td>';
                     html += '</tr>';
-                })
+                });
 				$("#activityBody").html(html);
 
                 // 数据处理完毕后 对前端展现分页相关信息

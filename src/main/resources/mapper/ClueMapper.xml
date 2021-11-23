@@ -34,10 +34,49 @@
     from tbl_clue
     where id = #{id,jdbcType=CHAR}
   </select>
+
+
+  <select id="selectClues" resultType="com.geekrose.crm.workbench.domain.Clue">
+    select c.id, c.fullname, c.appellation, u.name as owner, company,c.job, c.email, c.phone, c.website, c.mphone, c.state,
+    c.source, c.createBy, c.createTime, c.editBy, c.editTime, c.description, c.contactSummary, c.nextContactTime,
+    c.address
+    from tbl_clue c inner join tbl_user u
+    on c.owner = u.id
+    <where>
+      <if test="clue.fullname != null and clue.fullname != ''">
+        and c.fullname like '%' #{clue.fullname} '%'
+      </if>
+      <if test="clue.owner != null and clue.owner != ''">
+        and u.name like '%' #{clue.owner} '%'
+      </if>
+      <if test="clue.company != null and clue.company != ''">
+        and c.company like '%' #{clue.company} '%'
+      </if>
+      <if test="clue.phone != null and clue.phone != ''">
+        and c.phone like '%' #{clue.phone} '%'
+      </if>
+      <if test="clue.mphone != null and clue.mphone != ''">
+        and c.mphone like '%'  #{clue.mphone} '%'
+      </if>
+      <if test="clue.source != null and clue.source != ''">
+        and c.source = #{clue.source}
+      </if>
+      <if test="clue.state != null and clue.state != ''">
+        and c.state = #{clue.state}
+      </if>
+    </where>
+    limit #{skipCount},#{pageSize}
+  </select>
+
+  <select id="getTotalCount" resultType="java.lang.Integer">
+    select count(*) from tbl_clue
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_clue
     where id = #{id,jdbcType=CHAR}
   </delete>
+
   <insert id="insert" parameterType="com.geekrose.crm.workbench.domain.Clue">
     insert into tbl_clue (id, fullname, appellation, 
       owner, company, job, email, 
@@ -54,6 +93,7 @@
       #{description,jdbcType=VARCHAR}, #{contactsummary,jdbcType=VARCHAR}, #{nextcontacttime,jdbcType=CHAR}, 
       #{address,jdbcType=VARCHAR})
   </insert>
+
   <insert id="insertSelective" parameterType="com.geekrose.crm.workbench.domain.Clue">
     insert into tbl_clue
     <trim prefix="(" suffix=")" suffixOverrides=",">
