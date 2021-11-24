@@ -26,6 +26,15 @@ public class ClueTest {
         }
 
     }
+    @Test
+    public void testEditInfo(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ClueService clueService = context.getBean("clueService", ClueService.class);
+        clueService.deleteClue("d25afa8878724352b06fc537c0b80fb1");
+
+
+    }
+
 
 
 

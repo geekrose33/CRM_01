@@ -59,10 +59,10 @@ request.getServerPort() + request.getContextPath() + "/";
 
         $("#remarkBody").on("mouseover",".remarkDiv",function(){
             $(this).children("div").children("div").show();
-        })
+        });
         $("#remarkBody").on("mouseout",".remarkDiv",function(){
             $(this).children("div").children("div").hide();
-        })
+        });
 
         // 为添加按钮绑定事件
         $("#saveBtn").click(function () {

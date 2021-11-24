@@ -122,6 +122,144 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			pageList(1,5);
 		});
 
+
+
+		// 修改按钮
+        $("#editBtn").click(function () {
+            // 打开模态窗口前 先加载数据
+			// 指定修改模态窗口 将id传进去
+			var $id = $("input[name=one]:checked");
+			if ($id.length == 1){
+				var id = $id.val();
+				// $("#editClueModal").modal("show");
+			}else{
+				alert("请选择指定的线索");
+			}
+
+			$.ajax({
+				url:"workbench/clue/editClue.do",
+				dataType:"json",
+				type:"get",
+				data:{"id":id},
+				success:function (data) {
+					// data: 返回Clue
+					if (data!=null){
+						/*
+							返回
+								指定clue对象
+								users表中的name
+									线索状态和线索来源从application中获取
+						*/
+						var html = "<option></option>\n";
+
+						$.each(data.users,function (index,value) {
+							html += "<option>"+value.name+"</option>\n";
+						});
+
+						$("#edit-clueOwner").html(html);
+						$("#edit-clueOwner").val(data.clue.owner);
+						// 称呼 状态 来源
+						$("#edit-call").val(data.clue.appellation);
+						$("#edit-status").val(data.clue.state);
+						$("#edit-source").val(data.clue.source);
+						// 设置公司
+						$("#edit-company").val(data.clue.company);
+						// 设置姓名
+						$("#edit-surname").val(data.clue.fullname);
+						$("#edit-phone").val(data.clue.phone);
+						$("#edit-mphone").val(data.clue.mphone);
+						$("#edit-website").val(data.clue.website);
+						$("#edit-job").val(data.clue.job);
+						$("#edit-email").val(data.clue.email);
+						$("#edit-describe").val(data.clue.description);
+						$("#edit-contactSummary").val(data.clue.contactsummary);
+						$("#edit-nextContactTime").val(data.clue.nextcontacttime);
+						$("#edit-address").val(data.clue.address);
+
+						// 打开模态窗口
+						$("#editClueModal").modal("show");
+
+					}else{
+						// 获取失败
+						alert("修改失败");
+					}
+				}
+			})
+
+        });
+
+        // 更新按钮
+		$("#updateBtn").click(function () {
+			var id = $("input[name=one]:checked").val();
+			// 修改
+			$.post(
+					"workbench/clue/updateClue.do",
+					{
+						"id":id,
+						"owner":$.trim($("#edit-clueOwner").val()),
+						"appellation":$.trim($("#edit-call").val()),
+						"state":$.trim($("#edit-status").val()),
+						"source":$.trim($("#edit-source").val()),
+						"company":$.trim($("#edit-company").val()),
+						"fullname":$.trim($("#edit-surname").val()),
+						"phone":$.trim($("#edit-phone").val()),
+						"mphone":$.trim($("#edit-mphone").val()),
+						"website":$.trim($("#edit-website").val()),
+						"job":$.trim($("#edit-job").val()),
+						"email":$.trim($("#edit-email").val()),
+						"description":$.trim($("#edit-describe").val()),
+						"contactsummary":$.trim($("#edit-contactSummary").val()),
+						"nextcontacttime":$.trim($("#edit-nextContactTime").val()),
+						"address":$.trim($("#edit-address").val())
+					},
+					function (data) {
+						// 返回修改标识 success
+						if (data.success){
+							// 刷新列表
+							pageList(1,5);
+							// 关闭模态窗口
+							$("#editClueModal").modal("hide");
+						}else{
+							alert("修改失败");
+						}
+					},
+					"json"
+			)
+		});
+        // 删除按钮
+		$("#deleteBtn").click(function () {
+			// 找到指定clue
+			var id = $("input[name=one]:checked").val();
+			if (confirm("确定要删除么")){
+				$.post(
+						"workbench/clue/deleteClue.do",
+						{
+							"id":id
+						},
+						function (data) {
+							if (data.success){
+								// 刷新列表
+								pageList(1,5);
+							}else{
+								alert("删除失败");
+							}
+						},
+						"json"
+				)
+			}
+		});
+
+
+		// 全选反选
+		$("#all").click(function () {
+			$("input[name=one]").prop("checked",this.checked);
+		});
+
+		// 点满选择按钮 全选也进入被点击状态
+		$("#pageListBody").on("click",$("input[name=one]"),function () {
+			$("#all").prop("checked",$("input[name=one]").length===$("input[name=one]:checked").length);
+		});
+
 		// 每次刷新点击都要刷新一下列表
 		pageList(1,5);
 
@@ -131,6 +269,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	});
 
 	function pageList(pageNo,pageSize) {
+		// 每次刷新 将被点击的选择框也刷新
+		$("#all").prop("checked",false);
 		// 刷新列表信息
 		$("#search-clue-name").val($.trim($("#hidden-name").val()));
 		$("#search-clue-company").val($.trim($("#hidden-company").val()));
@@ -161,8 +301,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				$.each(data.clues,function (index,value) {
 
 					html += "<tr>";
-					html += '<td><input type="checkbox" /></td>';
-					html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/clue/detail.jsp\';">'+value.fullname+value.appellation+'</a></td>';
+					html += '<td><input type="checkbox" name="one" value="'+value.id+'"/></td>';
+					html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/clue/detailClue.do?id='+value.id+'\';">'+value.fullname+value.appellation+'</a></td>';
 					html += "<td>"+value.company+"</td>";
 					html += "<td>"+value.phone+"</td>";
 					html += "<td>"+value.mphone+"</td>";
@@ -183,7 +323,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					rowsPerPage: pageSize, // 每页显示的记录条数
 					maxRowsPerPage: 20, // 每页最多显示的记录条数
 					totalPages: totalPages, // 总页数
-					totalRows: data.total, // 总记录条数
+					totalRows: data.totalCount, // 总记录条数
 
 					visiblePageLinks: 5, // 显示几个卡片
 
@@ -373,9 +513,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<label for="edit-clueOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-clueOwner">
-								  <option>zhangsan</option>
-								  <option>lisi</option>
-								  <option>wangwu</option>
+
 								</select>
 							</div>
 							<label for="edit-company" class="col-sm-2 control-label">公司<span style="font-size: 15px; color: red;">*</span></label>
@@ -389,11 +527,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-call">
 								  <option></option>
-								  <option selected>先生</option>
-								  <option>夫人</option>
-								  <option>女士</option>
-								  <option>博士</option>
-								  <option>教授</option>
+								  <c:forEach items="${appellationList}" var="a">
+									  <option>${a.text}</option>
+								  </c:forEach>
+<%--								  <option selected>先生</option>--%>
+<%--								  <option>夫人</option>--%>
+<%--								  <option>女士</option>--%>
+<%--								  <option>博士</option>--%>
+<%--								  <option>教授</option>--%>
 								</select>
 							</div>
 							<label for="edit-surname" class="col-sm-2 control-label">姓名<span style="font-size: 15px; color: red;">*</span></label>
@@ -433,13 +574,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-status">
 								  <option></option>
-								  <option>试图联系</option>
-								  <option>将来联系</option>
-								  <option selected>已联系</option>
-								  <option>虚假线索</option>
-								  <option>丢失线索</option>
-								  <option>未联系</option>
-								  <option>需要条件</option>
+									<c:forEach items="${clueStateList}" var="c">
+										<option>${c.text}</option>
+									</c:forEach>
+<%--								  <option>试图联系</option>--%>
+<%--								  <option>将来联系</option>--%>
+<%--								  <option selected>已联系</option>--%>
+<%--								  <option>虚假线索</option>--%>
+<%--								  <option>丢失线索</option>--%>
+<%--								  <option>未联系</option>--%>
+<%--								  <option>需要条件</option>--%>
 								</select>
 							</div>
 						</div>
@@ -449,20 +593,23 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-source">
 								  <option></option>
-								  <option selected>广告</option>
-								  <option>推销电话</option>
-								  <option>员工介绍</option>
-								  <option>外部介绍</option>
-								  <option>在线商场</option>
-								  <option>合作伙伴</option>
-								  <option>公开媒介</option>
-								  <option>销售邮件</option>
-								  <option>合作伙伴研讨会</option>
-								  <option>内部研讨会</option>
-								  <option>交易会</option>
-								  <option>web下载</option>
-								  <option>web调研</option>
-								  <option>聊天</option>
+									<c:forEach items="${sourceList}" var="s">
+										<option>${s.text}</option>
+									</c:forEach>
+<%--								  <option selected>广告</option>--%>
+<%--								  <option>推销电话</option>--%>
+<%--								  <option>员工介绍</option>--%>
+<%--								  <option>外部介绍</option>--%>
+<%--								  <option>在线商场</option>--%>
+<%--								  <option>合作伙伴</option>--%>
+<%--								  <option>公开媒介</option>--%>
+<%--								  <option>销售邮件</option>--%>
+<%--								  <option>合作伙伴研讨会</option>--%>
+<%--								  <option>内部研讨会</option>--%>
+<%--								  <option>交易会</option>--%>
+<%--								  <option>web下载</option>--%>
+<%--								  <option>web调研</option>--%>
+<%--								  <option>聊天</option>--%>
 								</select>
 							</div>
 						</div>
@@ -470,7 +617,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						<div class="form-group">
 							<label for="edit-describe" class="col-sm-2 control-label">描述</label>
 							<div class="col-sm-10" style="width: 81%;">
-								<textarea class="form-control" rows="3" id="edit-describe">这是一条线索的描述信息</textarea>
+								<textarea class="form-control" rows="3" id="edit-describe"></textarea>
 							</div>
 						</div>
 						
@@ -480,13 +627,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<div class="form-group">
 								<label for="edit-contactSummary" class="col-sm-2 control-label">联系纪要</label>
 								<div class="col-sm-10" style="width: 81%;">
-									<textarea class="form-control" rows="3" id="edit-contactSummary">这个线索即将被转换</textarea>
+									<textarea class="form-control" rows="3" id="edit-contactSummary"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
 								<label for="edit-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
 								<div class="col-sm-10" style="width: 300px;">
-									<input type="text" class="form-control" id="edit-nextContactTime" value="2017-05-01">
+									<input type="text" class="form-control" id="edit-nextContactTime">
 								</div>
 							</div>
 						</div>
@@ -497,7 +644,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                             <div class="form-group">
                                 <label for="edit-address" class="col-sm-2 control-label">详细地址</label>
                                 <div class="col-sm-10" style="width: 81%;">
-                                    <textarea class="form-control" rows="1" id="edit-address">北京大兴区大族企业湾</textarea>
+                                    <textarea class="form-control" rows="1" id="edit-address"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -506,7 +653,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+					<button type="button" class="btn btn-primary" id="updateBtn">更新</button>
 				</div>
 			</div>
 		</div>
@@ -616,7 +763,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<div class="btn-group" style="position: relative; top: 18%;">
 				  <button type="button" class="btn btn-primary" id="addBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" id="editBtn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button type="button" class="btn btn-danger" id="deleteBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				
 				
@@ -625,7 +772,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input type="checkbox" id="all" /></td>
 							<td>名称</td>
 							<td>公司</td>
 							<td>公司座机</td>

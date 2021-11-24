@@ -22,4 +22,8 @@ public interface ClueMapper {
     List<Clue> selectClues(@Param(value = "skipCount") Integer pageNo,@Param(value = "pageSize") Integer pageSize,@Param(value = "clue") Clue clue);
 
     int getTotalCount();
+
+    Clue getEditInfoById(String id);
+
+//    int updateClueUserInfoById(Clue clue);
 }

@@ -24,4 +24,6 @@ public interface UserMapper {
     User selectUserByActAndPwd(@Param(value = "user") String loginAct,@Param(value = "pass") String loginPwd);
 
     Integer selectCountByActAndPwd(@Param(value = "user")String loginAct,@Param(value = "pass") String loginPwd);
+
+    String getIdByName(String name);
 }

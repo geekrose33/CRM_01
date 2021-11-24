@@ -214,4 +214,8 @@
     select count(*) from tbl_user where loginAct = #{user} and loginPwd = #{pass}
   </select>
 
+  <select id="getIdByName" resultType="java.lang.String">
+    select id from tbl_user where name = #{name}
+  </select>
+
 </mapper>

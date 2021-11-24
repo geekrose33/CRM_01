@@ -3,9 +3,12 @@ package com.geekrose.crm.workbench.service.impl;
 import com.geekrose.crm.settings.dao.UserMapper;
 import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.utils.DateTimeUtil;
+import com.geekrose.crm.utils.MD5Util;
 import com.geekrose.crm.utils.UUIDUtil;
 import com.geekrose.crm.workbench.dao.ClueMapper;
+import com.geekrose.crm.workbench.dao.ClueRemarkMapper;
 import com.geekrose.crm.workbench.domain.Clue;
+import com.geekrose.crm.workbench.domain.ClueRemark;
 import com.geekrose.crm.workbench.service.ClueService;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,9 @@ public class ClueServiceImpl implements ClueService {
 
     @Resource
     private ClueMapper clueDao;
+
+    @Resource
+    private ClueRemarkMapper remarkDao;
 
     public List<User> getUsers() {
         List<User> users = userDao.selectUserList();
@@ -56,5 +62,79 @@ public class ClueServiceImpl implements ClueService {
     public int getTotalCount() {
         int num = clueDao.getTotalCount();
         return num;
+    }
+
+    public Clue getEditInfoById(String id) {
+        Clue clue = clueDao.getEditInfoById(id);
+
+        return clue;
+    }
+
+    public boolean updateClue(Clue clue) {
+        clue.setEdittime(DateTimeUtil.getSysTime());
+        // 将owner的String换成id
+        String uid = userDao.getIdByName(clue.getOwner());
+
+        clue.setOwner(uid);
+
+        int i = clueDao.updateByPrimaryKeySelective(clue);
+        if (i == 1){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deleteClue(String id) {
+        boolean flag = false;
+        int i = clueDao.deleteByPrimaryKey(id);
+
+        if (i==1){
+            flag = true;
+        }
+
+        return flag;
+    }
+
+    public Clue getClueById(String id) {
+
+        Clue clue = clueDao.selectByPrimaryKey(id);
+
+        return clue;
+    }
+
+    public List<ClueRemark> showClueRemark(String id) {
+        List<ClueRemark> list = remarkDao.getRemarksByClueId(id);
+        return list;
+    }
+
+    public boolean addClueRemark(ClueRemark remark) {
+        boolean flag = false;
+        remark.setCreatetime(DateTimeUtil.getSysTime());
+        remark.setId(MD5Util.getMD5(UUIDUtil.getUUID()));
+        remark.setEditflag("0");
+        int i = remarkDao.insert(remark);
+        if (i == 1){
+            flag = true;
+        }
+        return flag;
+    }
+
+    public boolean removeRemark(String id) {
+        int i = remarkDao.deleteByPrimaryKey(id);
+        if (i == 1){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateClueRemark(String id, String notecontent) {
+        ClueRemark remark = new ClueRemark();
+        remark.setId(id);
+        remark.setNotecontent(notecontent);
+        int i = remarkDao.updateByPrimaryKeySelective(remark);
+        if (i == 1){
+            return true;
+        }
+        return false;
     }
 }
