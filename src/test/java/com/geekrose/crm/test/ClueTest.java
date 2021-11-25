@@ -1,5 +1,6 @@
 package com.geekrose.crm.test;
 
+import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.domain.Clue;
 import com.geekrose.crm.workbench.service.ClueService;
 import org.junit.Test;
@@ -35,7 +36,16 @@ public class ClueTest {
 
     }
 
+    @Test
+    public void testGetActsByClueId(){
+//        323bf3c7627b4247877bd3de4c797867
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ClueService clueService = context.getBean("clueService", ClueService.class);
+        List<Activity> activities = clueService.getActListForNameNotByClueId("发传单", "323bf3c7627b4247877bd3de4c797867");
+        for (Activity activity : activities) {
+            System.out.println(activity);
+        }
+    }
+    }
 
 
-
-}

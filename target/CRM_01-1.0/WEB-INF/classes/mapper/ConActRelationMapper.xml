@@ -15,6 +15,7 @@
     from tbl_contacts_activity_relation
     where id = #{id,jdbcType=CHAR}
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_contacts_activity_relation
     where id = #{id,jdbcType=CHAR}

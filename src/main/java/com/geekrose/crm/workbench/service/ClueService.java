@@ -1,6 +1,7 @@
 package com.geekrose.crm.workbench.service;
 
 import com.geekrose.crm.settings.domain.User;
+import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.domain.Clue;
 import com.geekrose.crm.workbench.domain.ClueRemark;
 
@@ -31,4 +32,12 @@ public interface ClueService {
     boolean removeRemark(String id);
 
     boolean updateClueRemark(String id, String notecontent);
+
+    List<Activity> getActivityListByClueId(String id);
+
+    boolean deleteRelation(String id);
+
+    List<Activity> getActListForNameNotByClueId(String name, String clueId);
+
+    boolean bondActClue(String clueId, String[] actIds);
 }

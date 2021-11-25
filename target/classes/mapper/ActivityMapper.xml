@@ -18,6 +18,11 @@
     id, owner, name, startDate, endDate, cost, description, createTime, createBy, editTime, 
     editBy
   </sql>
+
+  <sql id="Act_User_Column">
+    a.id, u.name as owner, a.name, a.startDate, a.endDate, a.cost, a.description, a.createTime, a.createBy, a.editTime,
+    a.editBy
+  </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -28,8 +33,7 @@
 
   <select id="selectActDetailById" resultType="com.geekrose.crm.workbench.domain.Activity">
     select
-    a.id, u.name as owner, a.name, a.startDate, a.endDate, a.cost, a.description, a.createTime, a.createBy, a.editTime,
-    a.editBy
+    <include refid="Act_User_Column"></include>
     from tbl_activity a inner join tbl_user u
     on a.owner = u.id
     where a.id = #{id}
@@ -39,10 +43,7 @@
   <!--  将查到的activity中owner换为user.name-->
   <select id="selectActivitiesByPage" resultType="com.geekrose.crm.workbench.domain.Activity">
 
-    select a.id, u.name as owner, a.name, a.startDate,
-      a.endDate, a.cost, a.description,
-      a.createTime, a.createBy, a.editTime,
-      a.editBy
+    select <include refid="Act_User_Column"></include>
       from tbl_activity a inner join tbl_user u
       on a.owner = u.id
       <where>
@@ -68,9 +69,42 @@
     select count(*) from tbl_activity
   </select>
 
+<!--  批量查询acts-->
+  <!--<select id="selectActsByIds" resultMap="BaseResultMap">
+    select
+    a.id, u.name as owner, a.name, a.startDate, a.endDate, a.cost, a.description, a.createTime, a.createBy, a.editTime,
+    a.editBy
+    from tbl_activity a inner join tbl_user u
+    on a.owner = u.id
+    where a.id in
+    <foreach collection="array" item="id" open="(" close=")" separator=",">
+        #{id}
+    </foreach>
+  </select>
+-->
+  <select id="getActsByClueId" resultType="com.geekrose.crm.workbench.domain.Activity">
+    select
+    car.id as id, u.name as owner, a.name, a.startDate, a.endDate
+    from tbl_activity a
+    inner join tbl_user u
+    on a.owner = u.id
+    inner join tbl_clue_activity_relation car
+    on a.id = car.activityId
+    where car.clueId = #{id}
+  </select>
 
+  <select id="getActsForNameNotByClueId" resultMap="BaseResultMap">
+    select <include refid="Act_User_Column"></include>
+    from tbl_activity a
+    inner join tbl_user u
+    on a.owner = u.id
+    where a.name like '%' #{name} '%' and a.id not in (
+        select activityId
+        from tbl_clue_activity_relation
+        where clueId = #{clueId}
+    )
 
-
+  </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_activity

@@ -5,9 +5,13 @@ import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.utils.DateTimeUtil;
 import com.geekrose.crm.utils.MD5Util;
 import com.geekrose.crm.utils.UUIDUtil;
+import com.geekrose.crm.workbench.dao.ActivityMapper;
+import com.geekrose.crm.workbench.dao.ClueActRelationMapper;
 import com.geekrose.crm.workbench.dao.ClueMapper;
 import com.geekrose.crm.workbench.dao.ClueRemarkMapper;
+import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.domain.Clue;
+import com.geekrose.crm.workbench.domain.ClueActRelation;
 import com.geekrose.crm.workbench.domain.ClueRemark;
 import com.geekrose.crm.workbench.service.ClueService;
 import org.springframework.stereotype.Service;
@@ -29,6 +33,12 @@ public class ClueServiceImpl implements ClueService {
 
     @Resource
     private ClueRemarkMapper remarkDao;
+
+    @Resource
+    private ClueActRelationMapper clueActDao;
+
+    @Resource
+    private ActivityMapper actDao;
 
     public List<User> getUsers() {
         List<User> users = userDao.selectUserList();
@@ -135,6 +145,48 @@ public class ClueServiceImpl implements ClueService {
         if (i == 1){
             return true;
         }
+        return false;
+    }
+
+    public List<Activity> getActivityListByClueId(String id) {
+        // 这里的id 是clue id
+//        String actIds[] = clueActDao.selectActIdsByClueId(id);
+//        List<Activity> acts = actDao.selectActsByIds(actIds);
+        List<Activity> acts = actDao.getActsByClueId(id);
+        return acts;
+    }
+
+    public boolean deleteRelation(String id) {
+
+        int i = clueActDao.deleteByPrimaryKey(id);
+        if (i == 1){
+            return true;
+        }
+
+        return false;
+    }
+
+    public List<Activity> getActListForNameNotByClueId(String name, String clueId) {
+
+        List<Activity> list = actDao.getActsForNameNotByClueId(name,clueId);
+        return list;
+    }
+
+    public boolean bondActClue(String clueId, String[] actIds) {
+
+        int i = 0;
+        for (String actId : actIds) {
+
+            ClueActRelation relation = new ClueActRelation();
+            relation.setId(MD5Util.getMD5(UUIDUtil.getUUID()));
+            relation.setClueid(clueId);
+            relation.setActivityid(actId);
+            i += clueActDao.insert(relation);
+        }
+        if (i == actIds.length){
+            return true;
+        }
+
         return false;
     }
 }

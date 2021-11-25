@@ -464,4 +464,25 @@ data-target="#createActivityModal" 表示具体打开哪个模态窗口 根据#i
 
 
 
+### 七、线索与市场活动关联
+
+这里线索表与市场活动表是多对多的关系，需要建立一张第三方表存储两张表的外键
+
+即：
+
+* tbl_activity
+* tbl_clue
+* tbl_clue_activity_relation
+
+注意：
+
+在写线索详情页中的添加关联时，选中多个市场活动记录的id，ajax请求中由于发送的是数组，所以不需要加引号
+
+> 这里在进行获取id时由于使用jQuery获取的是jQuery对象
+>
+> 我使用forEach 获取其中的dom对象，由于dom对象不能使用val()方法，我再使用$(domObj)将其转化为jquery对象使用 val() 方法获取value属性存储的activityid
+
+SpringMVC在接收时使用注解@RequestParam（value=“xxx[]”）形式接收
+
+
 

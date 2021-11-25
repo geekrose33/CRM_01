@@ -108,12 +108,140 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			$(this).children("div").children("div").hide();
 		});
 
+		// 给添加关联的搜索框绑定事件
+		$("#aNameForSearch").keydown(function (event) {
+			if (event.keyCode == 13){
+
+				$.get(
+						"workbench/clue/getActListForNameNotByClueId.do",
+						{
+							"clueId":"${clue.id}",
+							"name":$.trim($("#aNameForSearch").val())
+						},function (data) {
+							// 传来的是activity 集合
+							var html = "";
+							$.each(data,function (index,value) {
+								html += '<tr>';
+								html += '<td><input type="checkbox" name="check-one" value="'+value.id+'"/></td>';
+								html += '<td>'+value.name+'</td>';
+								html += '<td>'+value.startdate+'</td>';
+								html += '<td>'+value.enddate+'</td>';
+								html += '<td>'+value.owner+'</td>';
+								html += '</tr>';
+							});
+							$("#actNotByIdList").html(html);
+
+						},
+						"json"
+				);
+
+				// 在查询后为了表面回车默认的强制刷新 使用return false 截止刷新
+				return false;
+			}
+		});
+		// 给关联按钮绑定事件
+		$("#relateBtn").click(function () {
+			var $ids = $("input[name=check-one]:checked");
+
+			var ids = [];
+
+			$.each($ids,function (index,value) {
+				ids.push($(value).val());
+			});
+
+			$.post(
+					"workbench/clue/bond.do",
+					{
+						actIds:ids,
+						"clueId":"${clue.id}"
+					},
+
+					function (data) {
+						// 返回添加成功标识
+						if (data.success){
+							// 刷新
+							showActivityList();
+							// 关闭模态窗口
+							$("#bundModal").modal("hide");
+						}else{
+							alert("添加失败");
+						}
+					},
+					"json"
+			)
+
+
+		});
+
+
+		// 全选反选
+		$("#check-all").click(function () {
+			$("input[name=check-one]").prop("checked",this.checked);
+		});
+
+		// 当所有选择都点击后 全选也亮
+		$("#actNotByIdList").on("click",function () {
+			$("#check-all").prop("checked",$("input[name=check-one]").length == $("input[name=check-one]:checked").length);
+		});
+
+
 		// 刷新备注
 		pageListRemark("${clue.id}");
 
+		// 刷新关联的市场活动列表
+		showActivityList();
 
 	});
+	function showActivityList() {
 
+		$.get(
+				"workbench/clue/showActivityList.do",
+				{
+					"id":"${clue.id}"
+				},
+				function (data) {
+					var html = "";
+					$.each(data,function (index,value) {
+
+						html += '<tr>';
+						html += '<td>'+value.name+'</td>';
+						html += '<td>'+value.startdate+'</td>';
+						html += '<td>'+value.enddate+'</td>';
+						html += '<td>'+value.owner+'</td>';
+						// 这里的id通过Mybatis中多表联查 将关联表的id赋值给了activity对象的id 即该id为关联表的id
+						html += '<td><a href="javascript:void(0);"  style="text-decoration: none;" onclick="unbond(\''+value.id+'\')"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>';
+						html += '</tr>';
+
+					})
+
+					$("#activityBody").html(html);
+				},
+				"json"
+		)
+
+	}
+	function unbond(id) {
+		// alert(id);
+		if (confirm("你确定要解除绑定么")){
+			$.post(
+					"workbench/clue/unbond.do",
+					{
+						"id":id
+					},
+					function (data) {
+						if (data.success){
+							// 解除成功
+							// 刷新列表
+							showActivityList();
+						}else{
+							alert("解除失败");
+						}
+					},
+					"json"
+			)
+		}
+
+	}
 
 	// 刷新备注
 	// 传入线索的id 显示线索的备注列表
@@ -235,7 +363,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<div class="btn-group" style="position: relative; top: 18%; left: 8px;">
 						<form class="form-inline" role="form">
 						  <div class="form-group has-feedback">
-						    <input type="text" class="form-control" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
+						    <input type="text" class="form-control" id="aNameForSearch" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
 						    <span class="glyphicon glyphicon-search form-control-feedback"></span>
 						  </div>
 						</form>
@@ -243,7 +371,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<table id="activityTable" class="table table-hover" style="width: 900px; position: relative;top: 10px;">
 						<thead>
 							<tr style="color: #B3B3B3;">
-								<td><input type="checkbox"/></td>
+								<td><input type="checkbox" id="check-all"/></td>
 								<td>名称</td>
 								<td>开始日期</td>
 								<td>结束日期</td>
@@ -251,8 +379,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<td></td>
 							</tr>
 						</thead>
-						<tbody>
-							<tr>
+						<tbody id="actNotByIdList">
+							<%--<tr>
 								<td><input type="checkbox"/></td>
 								<td>发传单</td>
 								<td>2020-10-10</td>
@@ -265,13 +393,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<td>2020-10-10</td>
 								<td>2020-10-20</td>
 								<td>zhangsan</td>
-							</tr>
+							</tr>--%>
 						</tbody>
 					</table>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">关联</button>
+					<button type="button" class="btn btn-primary" id="relateBtn">关联</button>
 				</div>
 			</div>
 		</div>
@@ -598,8 +726,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<td></td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
+					<tbody id="activityBody">
+						<%--<tr>
 							<td>发传单</td>
 							<td>2020-10-10</td>
 							<td>2020-10-20</td>
@@ -612,7 +740,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<td>2020-10-20</td>
 							<td>zhangsan</td>
 							<td><a href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
-						</tr>
+						</tr>--%>
 					</tbody>
 				</table>
 			</div>

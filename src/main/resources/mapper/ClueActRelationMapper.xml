@@ -15,6 +15,13 @@
     from tbl_clue_activity_relation
     where id = #{id,jdbcType=CHAR}
   </select>
+
+  <!--  根据clue id 查询activity id-->
+<!--  <select id="selectActIdsByClueId" parameterType="java.lang.String" resultType="java.lang.String">
+    select activityId from tbl_clue_activity_relation where clueId = #{id}
+  </select>-->
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_clue_activity_relation
     where id = #{id,jdbcType=CHAR}

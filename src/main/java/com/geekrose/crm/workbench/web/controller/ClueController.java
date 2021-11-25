@@ -2,6 +2,7 @@ package com.geekrose.crm.workbench.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geekrose.crm.settings.domain.User;
+import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.domain.Clue;
 import com.geekrose.crm.workbench.domain.ClueRemark;
 import com.geekrose.crm.workbench.service.ClueService;
@@ -15,6 +16,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -175,6 +177,46 @@ public class ClueController {
 
         String json = mapper.writeValueAsString(map);
         response.getWriter().print(json);
+    }
+
+    @RequestMapping("/showActivityList.do")
+    public @ResponseBody List<Activity> doShowActivityList(String id){
+
+        List<Activity> list = clueService.getActivityListByClueId(id);
+        return list;
+    }
+    @RequestMapping("/unbond.do")
+    public void doUnBond(HttpServletResponse response,String id) throws IOException {
+
+        boolean success = false;
+        success = clueService.deleteRelation(id);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+
+    }
+    @RequestMapping("/getActListForNameNotByClueId.do")
+    public @ResponseBody List<Activity> doGetActListForNameNotByClueId(String name,String clueId){
+
+        List<Activity> list = clueService.getActListForNameNotByClueId(name,clueId);
+        return list;
+    }
+    @RequestMapping("/bond.do")
+    public void doBond(HttpServletResponse response,String clueId,@RequestParam(value = "actIds[]") String[] actIds) throws IOException {
+
+
+        boolean success = false;
+        success = clueService.bondActClue(clueId,actIds);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+
     }
 
 }

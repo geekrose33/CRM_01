@@ -14,4 +14,6 @@ public interface ClueActRelationMapper {
     int updateByPrimaryKeySelective(ClueActRelation record);
 
     int updateByPrimaryKey(ClueActRelation record);
+
+//    String[] selectActIdsByClueId(String id);
 }
