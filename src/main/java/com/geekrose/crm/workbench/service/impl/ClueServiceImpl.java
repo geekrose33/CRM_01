@@ -189,4 +189,9 @@ public class ClueServiceImpl implements ClueService {
 
         return false;
     }
+
+    public List<Activity> getActListByName(String name) {
+        List<Activity> list = actDao.selectActivitiesByName(name);
+        return list;
+    }
 }

@@ -5,6 +5,7 @@ import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.domain.Clue;
 import com.geekrose.crm.workbench.domain.ClueRemark;
+import com.geekrose.crm.workbench.domain.Transaction;
 import com.geekrose.crm.workbench.service.ClueService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -217,6 +218,27 @@ public class ClueController {
         String json = mapper.writeValueAsString(map);
         response.getWriter().print(json);
 
+    }
+    @RequestMapping("/getActListByName.do")
+    public @ResponseBody List<Activity> doGetActListByName(String name){
+
+        List<Activity> list = clueService.getActListByName(name);
+        return list;
+    }
+
+    @RequestMapping("/convertClue.do")
+    public void doConvertClue(HttpServletResponse response,String flag , String clueid, Transaction tran) throws IOException {
+        /*System.out.println("tran --- "+ tran);
+        System.out.println("clueid --- "+ clueid);
+        System.out.println("flag --- "+ flag);*/
+        if ("true".equals(flag)){
+            // 添加市场活动
+
+        }else{
+            // 不添加市场活动
+
+        }
+        response.sendRedirect("workbench/clue/index.jsp");
     }
 
 }

@@ -18,6 +18,8 @@
     select <include refid="Base_Column_List"></include>
     from tbl_dic_value
     where typeCode = #{code}
+    order by orderNo
+
   </select>
 
 

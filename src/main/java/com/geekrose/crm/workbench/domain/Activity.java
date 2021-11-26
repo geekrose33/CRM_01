@@ -22,7 +22,10 @@ public class Activity {
     private String edittime; // 修改时间
 
     private String editby; // 修改人
+
+
     public Activity(){}
+
     public Activity(String id, String owner, String name, String startdate, String enddate, String cost, String description, String createtime, String createby, String edittime, String editby) {
         this.id = id;
         this.owner = owner;

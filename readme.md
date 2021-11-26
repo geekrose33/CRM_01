@@ -1,5 +1,7 @@
 # CRM_readme
 
+还在更新ing...
+
 使用的技术：maven git
 
 前端原型：搭建的html页面
@@ -12,9 +14,12 @@
 
 服务器：Tomcat
 
+测试：juit
+
 插件：自动补全 统计图表EChars Mybatis逆向工程的插件等
 
-
+系统介绍：
+    客户关系系统CRM，用于处理和存储市场活动、线索、客户信息、交易信息等企业业务相关的数据
 
 ### 一、物理模型
 
@@ -117,7 +122,7 @@
     
        我自己的mysql是8的所以这个 mysql 连接依赖得改版本
     
-    > 这里学习的项目是ssm，Mybatis主配置文件是单独出来的，这里我改为spring集成，直接写到spring配置文件中，只保留一个applicationContext.xml文件，配置文件太多看着闹心
+    > 这里学习的项目是ssm，Mybatis主配置文件是单独出来的，这里我改为spring集成，mybatis的配置文件只是用来配置日志的，其中的DataSource和Mapper声明代理dao都写到spring中
     
     **创建数据库**
     

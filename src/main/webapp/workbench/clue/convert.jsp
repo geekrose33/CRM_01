@@ -1,7 +1,17 @@
 ﻿<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+
+/*
+String fullname = request.getParameter("fullname");
+String id = request.getParameter("id");
+String appellation = request.getParameter("appellation");
+String company = request.getParameter("company");
+String owner = request.getParameter("owner");
+*/
+
 %>
 <!DOCTYPE html>
 <html>
@@ -20,6 +30,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 <script type="text/javascript">
 	$(function(){
+		// 时间控件
+		$(".time").datetimepicker({
+			minView: "month",
+			language:  'zh-CN',
+			format: 'yyyy-mm-dd',
+			autoclose: true,
+			todayBtn: true,
+			pickerPosition: "bottom-left"
+		});
+
 		$("#isCreateTransaction").click(function(){
 			if(this.checked){
 				$("#create-transaction2").show(200);
@@ -27,6 +47,80 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				$("#create-transaction2").hide(200);
 			}
 		});
+
+
+		$("#openSearchModalBtn").click(function () {
+			// 展现模态窗口
+			$("#searchActivityModal").modal("show");
+		});
+
+		// 为搜索回车绑定事件
+		$("#searchActs").keydown(function (event) {
+			if (event.keyCode == 13){
+
+				// ajax
+				$.get(
+						"workbench/clue/getActListByName.do",
+						{
+							// name
+							"name":$.trim($("#searchActs").val())
+						},
+						function (data) {
+							// Activity List
+							var html = "";
+
+							$.each(data,function (index,value) {
+								html += '<tr>';
+								html += '<td><input type="radio" name="activity" value="'+value.id+'"/></td>';
+								html += '<td id="n'+value.id+'">'+value.name+'</td>';
+								html += '<td>'+value.startdate+'</td>';
+								html += '<td>'+value.enddate+'</td>';
+								html += '<td>'+value.owner+'</td>';
+								html += '</tr>';
+							});
+							$("#activity-list").html(html);
+						},
+						"json"
+				);
+
+
+				return false;
+			}
+		});
+
+
+		// 提交绑定市场活动
+		$("#submitBtn").click(function () {
+			var $act = $("input[name=activity]:checked");
+			var id = $act.val();
+			// 填充activity name id
+			// 获取标签对中内容使用html() 获取单标签使用val()
+			$("#activityName").val($("#n"+id).html());
+
+			$("#activityId").val(id);
+
+			// 关闭模态窗口
+			$("#searchActivityModal").modal("hide");
+		});
+
+
+		// 点击转换 1.绑定市场活动 2.不绑定市场活动
+		$("#convertBtn").click(function () {
+
+			// 1.绑定
+			if ($("#isCreateTransaction").prop("checked")){
+
+				// 通过form表单发送请求（post）
+				$("#tran-form").submit();
+
+			}else{
+				// 2.不绑定
+				window.location.href="workbench/clue/convertClue.do?clueid=${param.id}";
+
+
+			}
+
+		})
 	});
 </script>
 
@@ -47,7 +141,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<div class="btn-group" style="position: relative; top: 18%; left: 8px;">
 						<form class="form-inline" role="form">
 						  <div class="form-group has-feedback">
-						    <input type="text" class="form-control" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
+						    <input type="text" id="searchActs" class="form-control" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
 						    <span class="glyphicon glyphicon-search form-control-feedback"></span>
 						  </div>
 						</form>
@@ -63,8 +157,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<td></td>
 							</tr>
 						</thead>
-						<tbody>
-							<tr>
+						<tbody id="activity-list">
+							<%--<tr>
 								<td><input type="radio" name="activity"/></td>
 								<td>发传单</td>
 								<td>2020-10-10</td>
@@ -77,60 +171,87 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								<td>2020-10-10</td>
 								<td>2020-10-20</td>
 								<td>zhangsan</td>
-							</tr>
+							</tr>--%>
 						</tbody>
 					</table>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" id="submitBtn">提交</button>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
+
+<%--
+	获取请求中的参数时 可以也可以使用el表达式
+	这里el表达式中需要加param获取参数值
+	el表达式为我们提供了N个隐含对象
+	只有XXXScope类型的可以省略
+	其他的隐含对象都不能省略，如果省略就会从域对象中取值
+
+	el表达式中的pageContext不能省略
+	代码脚本中pageContext(jsp内置对象) 作用：
+		1. 本身的页面域对象
+		2. 获取其他内置对象
+		3. 作为其他内置对象使用
+--%>
+	<%--${pageContext.request.contextPath}--%>
+	<%--<%
+		pageContext.setAttribute("aaa","aaa",pageContext.REQUEST_SCOPE);
+	%>--%>
+
 	<div id="title" class="page-header" style="position: relative; left: 20px;">
-		<h4>转换线索 <small>李四先生-动力节点</small></h4>
+		<%--<%=fullname%><%=appellation%>-<%=company%>--%>
+		<h4>转换线索 <small>${param.fullname}${param.appellation}-${param.company}</small></h4>
 	</div>
 	<div id="create-customer" style="position: relative; left: 40px; height: 35px;">
-		新建客户：动力节点
+		新建客户：${param.company}
 	</div>
 	<div id="create-contact" style="position: relative; left: 40px; height: 35px;">
-		新建联系人：李四先生
+		新建联系人：${param.fullname}${param.appellation}
 	</div>
 	<div id="create-transaction1" style="position: relative; left: 40px; height: 35px; top: 25px;">
 		<input type="checkbox" id="isCreateTransaction"/>
 		为客户创建交易
 	</div>
 	<div id="create-transaction2" style="position: relative; left: 40px; top: 20px; width: 80%; background-color: #F7F7F7; display: none;" >
-	
-		<form>
+
+
+<%--		使用form表单发送post请求--%>
+
+
+
+		<form id="tran-form" action="workbench/clue/convertClue.do">
+<%--			设置一个标识确认是否发送表单 用于后端验证--%>
+			<input type="hidden" name="flag" value="true">
+			<input type="hidden" name="clueid" value="${param.id}">
 		  <div class="form-group" style="width: 400px; position: relative; left: 20px;">
 		    <label for="amountOfMoney">金额</label>
-		    <input type="text" class="form-control" id="amountOfMoney">
+		    <input type="text" class="form-control" id="amountOfMoney" name="money">
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
 		    <label for="tradeName">交易名称</label>
-		    <input type="text" class="form-control" id="tradeName" value="动力节点-">
+		    <input type="text" class="form-control" id="tradeName" name="name" value="动力节点-">
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
 		    <label for="expectedClosingDate">预计成交日期</label>
-		    <input type="text" class="form-control" id="expectedClosingDate">
+		    <input type="text" class="form-control time" id="expectedClosingDate" name="expecteddate">
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
 		    <label for="stage">阶段</label>
-		    <select id="stage"  class="form-control">
+		    <select id="stage"  class="form-control" name="stage">
 		    	<option></option>
-		    	<option>资质审查</option>
-		    	<option>需求分析</option>
-		    	<option>价值建议</option>
-		    	<option>确定决策者</option>
-		    	<option>提案/报价</option>
-		    	<option>谈判/复审</option>
-		    	<option>成交</option>
-		    	<option>丢失的线索</option>
-		    	<option>因竞争丢失关闭</option>
+				<c:forEach items="${stageList}" var="s">
+					<option>${s.text}</option>
+				</c:forEach>
 		    </select>
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
-		    <label for="activity">市场活动源&nbsp;&nbsp;<a href="javascript:void(0);" data-toggle="modal" data-target="#searchActivityModal" style="text-decoration: none;"><span class="glyphicon glyphicon-search"></span></a></label>
-		    <input type="text" class="form-control" id="activity" placeholder="点击上面搜索" readonly>
+		    <label for="activityName">市场活动源&nbsp;&nbsp;<a href="javascript:void(0);" id="openSearchModalBtn" data-target="#searchActivityModal" style="text-decoration: none;"><span class="glyphicon glyphicon-search"></span></a></label>
+		    <input type="text" class="form-control" id="activityName" placeholder="点击上面搜索" readonly>
+			  <input type="hidden" id="activityId" name="activityid">
 		  </div>
 		</form>
 		
@@ -138,10 +259,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	
 	<div id="owner" style="position: relative; left: 40px; height: 35px; top: 50px;">
 		记录的所有者：<br>
-		<b>zhangsan</b>
+		<b>${param.owner}</b>
 	</div>
 	<div id="operation" style="position: relative; left: 40px; height: 35px; top: 100px;">
-		<input class="btn btn-primary" type="button" value="转换">
+		<input class="btn btn-primary" type="button" id="convertBtn" value="转换">
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<input class="btn btn-default" type="button" value="取消">
 	</div>

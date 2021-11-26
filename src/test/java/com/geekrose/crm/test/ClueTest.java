@@ -41,10 +41,11 @@ public class ClueTest {
 //        323bf3c7627b4247877bd3de4c797867
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
         ClueService clueService = context.getBean("clueService", ClueService.class);
-        List<Activity> activities = clueService.getActListForNameNotByClueId("发传单", "323bf3c7627b4247877bd3de4c797867");
+        List<Activity> activities = clueService.getActListByName("抖音");
         for (Activity activity : activities) {
             System.out.println(activity);
         }
+
     }
     }
 

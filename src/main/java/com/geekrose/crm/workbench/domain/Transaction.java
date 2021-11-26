@@ -3,7 +3,7 @@ package com.geekrose.crm.workbench.domain;
 public class Transaction {
     private String id;
 
-    private String owner;
+    private String owner; // ------- 外键 关联 tbl_user
 
     private String money;
 
@@ -11,7 +11,7 @@ public class Transaction {
 
     private String expecteddate;
 
-    private String customerid;
+    private String customerid; // ------- 外键 关联 tbl_customer
 
     private String stage;
 
@@ -19,9 +19,9 @@ public class Transaction {
 
     private String source;
 
-    private String activityid;
+    private String activityid; // ------- 外键 关联 tbl_activity
 
-    private String contactsid;
+    private String contactsid; // ------- 外键 关联 tbl_contacts
 
     private String createby;
 
@@ -36,6 +36,32 @@ public class Transaction {
     private String contactsummary;
 
     private String nextcontacttime;
+
+
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id='" + id + '\'' +
+                ", owner='" + owner + '\'' +
+                ", money='" + money + '\'' +
+                ", name='" + name + '\'' +
+                ", expecteddate='" + expecteddate + '\'' +
+                ", customerid='" + customerid + '\'' +
+                ", stage='" + stage + '\'' +
+                ", type='" + type + '\'' +
+                ", source='" + source + '\'' +
+                ", activityid='" + activityid + '\'' +
+                ", contactsid='" + contactsid + '\'' +
+                ", createby='" + createby + '\'' +
+                ", createtime='" + createtime + '\'' +
+                ", editby='" + editby + '\'' +
+                ", edittime='" + edittime + '\'' +
+                ", description='" + description + '\'' +
+                ", contactsummary='" + contactsummary + '\'' +
+                ", nextcontacttime='" + nextcontacttime + '\'' +
+                '}';
+    }
 
     public String getId() {
         return id;

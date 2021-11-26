@@ -106,6 +106,20 @@
 
   </select>
 
+
+  <select id="selectActivitiesByName" resultType="com.geekrose.crm.workbench.domain.Activity">
+    select a.id, a.name,u.name as owner, a.startDate, a.endDate
+    from tbl_activity a
+    inner join tbl_user u
+    on a.owner = u.id
+    <where>
+      <if test="name != null">
+        a.name like '%' #{name} '%'
+      </if>
+    </where>
+  </select>
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_activity
     where id = #{id,jdbcType=CHAR}

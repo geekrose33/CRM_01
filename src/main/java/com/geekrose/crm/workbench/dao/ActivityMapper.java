@@ -33,6 +33,8 @@ public interface ActivityMapper {
 
     List<Activity> getActsForNameNotByClueId(@Param("name") String name, @Param("clueId") String clueId);
 
+    List<Activity> selectActivitiesByName(@Param("name") String name);
+
 //    List<Activity> selectActsByIds(String[] actIds);
 
 //    List<User> selectUserById(List<String> owners);

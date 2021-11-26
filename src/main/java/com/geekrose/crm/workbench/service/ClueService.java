@@ -40,4 +40,6 @@ public interface ClueService {
     List<Activity> getActListForNameNotByClueId(String name, String clueId);
 
     boolean bondActClue(String clueId, String[] actIds);
+
+    List<Activity> getActListByName(String name);
 }
