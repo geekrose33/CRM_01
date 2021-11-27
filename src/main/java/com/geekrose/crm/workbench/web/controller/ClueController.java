@@ -55,10 +55,7 @@ public class ClueController {
     }
 
     @RequestMapping("/pageList.do")
-//    @ResponseBody
     public void doPageList(HttpServletResponse response,String pageNo,String pageSize,Clue clue) throws IOException {
-
-        System.out.println("----------"+ clue + "---------------");
 
         // 查询线索集合
         List<Clue> list = clueService.getClues(pageNo,pageSize,clue);

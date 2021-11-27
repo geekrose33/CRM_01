@@ -25,5 +25,7 @@ public interface ClueMapper {
 
     Clue getEditInfoById(String id);
 
+    Clue getClueById(String clueid);
+
 //    int updateClueUserInfoById(Clue clue);
 }

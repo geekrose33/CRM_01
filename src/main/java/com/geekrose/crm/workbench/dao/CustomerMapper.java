@@ -2,6 +2,8 @@ package com.geekrose.crm.workbench.dao;
 
 import com.geekrose.crm.workbench.domain.Customer;
 
+import java.util.List;
+
 public interface CustomerMapper {
     int deleteByPrimaryKey(String id);
 
@@ -16,4 +18,6 @@ public interface CustomerMapper {
     int updateByPrimaryKey(Customer record);
 
     Customer getCustomerByName(String company);
+
+    List<Customer> getCustomersByName(String name);
 }

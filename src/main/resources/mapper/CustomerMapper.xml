@@ -33,7 +33,11 @@
     where name = #{company}
   </select>
 
-
+  <select id="getCustomersByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_customer
+    where name like '%' #{name} '%'
+  </select>
 
 
 

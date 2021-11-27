@@ -248,7 +248,7 @@ public class ClueServiceImpl implements ClueService {
 
         boolean flag = true;
         // 第一步 根据clueid获取Clue的详细信息
-        Clue clue = clueDao.selectByPrimaryKey(clueid);
+        Clue clue = clueDao.getClueById(clueid);
 
         // 第二步 通过线索对象提供客户信息 当客户不存在时，新建客户
         Customer cus = cusDao.getCustomerByName(clue.getCompany());
@@ -373,6 +373,13 @@ public class ClueServiceImpl implements ClueService {
             tran.setNextcontacttime(clue.getNextcontacttime());
             tran.setOwner(clue.getOwner());
             tran.setSource(clue.getSource());
+            // 这里判断业务类型根据业务名称 相同的为已有业务 不同的为新业务
+            int isNum = tranDao.selectTranByName(tran.getName());
+            if (isNum == 0){
+                tran.setType("新业务");
+            }else {
+                tran.setType("已有业务");
+            }
 
             int tranNum = tranDao.insert(tran);
             if (tranNum!=1){

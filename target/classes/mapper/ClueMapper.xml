@@ -35,6 +35,13 @@
     c.address
   </sql>
 
+  <select id="getClueById" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_clue c inner join tbl_user u
+    on c.owner = u.id
+    where c.id = #{id}
+  </select>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select <include refid="Clue_user_Info"></include>
     from tbl_clue c inner join tbl_user u

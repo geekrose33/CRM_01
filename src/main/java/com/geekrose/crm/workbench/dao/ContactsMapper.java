@@ -1,6 +1,9 @@
 package com.geekrose.crm.workbench.dao;
 
 import com.geekrose.crm.workbench.domain.Contacts;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface ContactsMapper {
     int deleteByPrimaryKey(String id);
@@ -14,4 +17,6 @@ public interface ContactsMapper {
     int updateByPrimaryKeySelective(Contacts record);
 
     int updateByPrimaryKey(Contacts record);
+
+    List<Contacts> getContactByName(/*@Param("name") */String name);
 }

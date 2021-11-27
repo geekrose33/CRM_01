@@ -23,8 +23,13 @@
   </resultMap>
   <sql id="Base_Column_List">
     id, owner, money, name, expectedDate, customerId, stage, type, source, activityId, 
-    contactsId, createBy, createTime, editBy, editTime, description, contactSummary, 
+    contactsId, createBy, createTime, editBy, editTime, description, contactSummary,
     nextContactTime
+  </sql>
+  <sql id="Tran_User_Cus_Con_List">
+    t.id, u.name as owner, t.money, t.name, t.expectedDate, cu.name as customerId, t.stage, t.type, t.source, t.activityId,
+    co.fullname as contactsId, t.createBy, t.createTime, t.editBy, t.editTime, t.description,t. contactSummary,
+    t.nextContactTime
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -32,6 +37,57 @@
     from tbl_tran
     where id = #{id,jdbcType=CHAR}
   </select>
+
+  <select id="selectTranByName" resultType="int">
+    select count(*)
+    from tbl_tran
+    where name = #{name}
+  </select>
+
+
+
+  <select id="getTransByCondition" resultType="com.geekrose.crm.workbench.domain.Transaction">
+    select
+    <include refid="Tran_User_Cus_Con_List"/>
+    /*t.**/
+    from tbl_tran t
+    inner join tbl_user u on u.id = t.owner
+    inner join tbl_customer as cu on t.customerId = cu.id
+    inner join tbl_contacts as co on t.contactsId = co.id
+    <where>
+      <if test="tran.owner != null and tran.owner != ''">
+        and u.name like '%' #{tran.owner} '%'
+      </if>
+      <if test="tran.name != null and tran.name != ''">
+        and t.name like '%' #{tran.name} '%'
+      </if>
+      <if test="tran.contactsid != null and tran.contactsid != ''">
+        and co.fullname like '%' #{tran.contactsid} '%'
+      </if>
+      <if test="tran.customerid != null and tran.customerid != ''">
+        and cu.name like '%' #{tran.customerid} '%'
+      </if>
+      <if test="tran.source != null and tran.source != ''">
+        and t.source = #{tran.source}
+      </if>
+      <if test="tran.stage != null and tran.stage != ''">
+        and t.stage = #{tran.stage}
+      </if>
+      <if test="tran.type != null and tran.type != ''">
+        and t.type = #{tran.type}
+      </if>
+    </where>
+    order by t.createTime desc
+    limit #{skipCount},#{pageSize}
+
+  </select>
+
+
+<!--  查询记录数-->
+  <select id="selectCount" resultType="int">
+    select count(*) from tbl_tran
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_tran
     where id = #{id,jdbcType=CHAR}

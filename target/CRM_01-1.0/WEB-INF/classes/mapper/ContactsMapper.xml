@@ -32,6 +32,16 @@
     from tbl_contacts
     where id = #{id,jdbcType=CHAR}
   </select>
+
+
+  <select id="getContactByName" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_contacts
+    where fullname like '%' #{name} '%'
+  </select>
+
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_contacts
     where id = #{id,jdbcType=CHAR}
