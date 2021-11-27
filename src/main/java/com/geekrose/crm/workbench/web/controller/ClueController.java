@@ -227,18 +227,30 @@ public class ClueController {
     }
 
     @RequestMapping("/convertClue.do")
-    public void doConvertClue(HttpServletResponse response,String flag , String clueid, Transaction tran) throws IOException {
-        /*System.out.println("tran --- "+ tran);
-        System.out.println("clueid --- "+ clueid);
-        System.out.println("flag --- "+ flag);*/
-        if ("true".equals(flag)){
-            // 添加市场活动
+    public void doConvertClue(HttpSession session,HttpServletResponse response,String flag , String clueid, Transaction tran) throws IOException {
+        String createby = ((User)session.getAttribute("user")).getName();
 
+        // 当Flag不是true时说明没有添加transaction
+        if (!"true".equals(flag)){
+            tran = null;
+        }
+
+
+        boolean success = clueService.convertClue(clueid,tran,createby);
+
+
+        /*if ("true".equals(flag)){
+            // 添加市场活动
+            clueService.convertClue();
         }else{
             // 不添加市场活动
 
+        }*/
+        if (success){
+            response.sendRedirect("index.jsp");
         }
-        response.sendRedirect("workbench/clue/index.jsp");
+
+
     }
 
 }

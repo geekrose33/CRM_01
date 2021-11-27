@@ -115,7 +115,7 @@ String owner = request.getParameter("owner");
 
 			}else{
 				// 2.不绑定
-				window.location.href="workbench/clue/convertClue.do?clueid=${param.id}";
+				window.location.href="workbench/clue/convertClue.do?clueid=${param.id}&flag=false";
 
 
 			}

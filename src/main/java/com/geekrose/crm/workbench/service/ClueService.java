@@ -4,6 +4,7 @@ import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.domain.Clue;
 import com.geekrose.crm.workbench.domain.ClueRemark;
+import com.geekrose.crm.workbench.domain.Transaction;
 
 import java.util.List;
 
@@ -42,4 +43,6 @@ public interface ClueService {
     boolean bondActClue(String clueId, String[] actIds);
 
     List<Activity> getActListByName(String name);
+
+    boolean convertClue(String clueid, Transaction tran, String createby);
 }

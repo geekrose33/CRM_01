@@ -2,6 +2,8 @@ package com.geekrose.crm.workbench.dao;
 
 import com.geekrose.crm.workbench.domain.ClueActRelation;
 
+import java.util.List;
+
 public interface ClueActRelationMapper {
     int deleteByPrimaryKey(String id);
 
@@ -14,6 +16,8 @@ public interface ClueActRelationMapper {
     int updateByPrimaryKeySelective(ClueActRelation record);
 
     int updateByPrimaryKey(ClueActRelation record);
+
+    List<ClueActRelation> getListByClueId(String clueid);
 
 //    String[] selectActIdsByClueId(String id);
 }

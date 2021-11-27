@@ -21,6 +21,14 @@
     select activityId from tbl_clue_activity_relation where clueId = #{id}
   </select>-->
 
+  <select id="getListByClueId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from tbl_clue_activity_relation
+    where clueId = #{clueid}
+
+  </select>
+
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_clue_activity_relation
