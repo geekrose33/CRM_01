@@ -3,11 +3,16 @@
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+
+Map<String,String> pMap =(Map<String,String>) application.getAttribute("pMap");
+Set<String> keys = pMap.keySet();
+
+
 %>
 <!DOCTYPE html>
 <html>
 <head>
-	<base href="<%=basePath%>"/>
+<base href="<%=basePath%>"/>
 <meta charset="UTF-8">
 
 <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
@@ -19,8 +24,69 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
 <script type="text/javascript" src="jquery/bs_typeahead/bootstrap3-typeahead.min.js"></script>
 <script type="text/javascript">
+    /*
+        可能性字段是用来给用户显示的字段 不存储在数据库表中
+        它和表中字段stage阶段一一对应
+        stage       possibility
+        key         value
+        01资质审查   10
+        07          100
 
+        这种数据不存到数据库中， 数据库存储的是表数据
+        这种数据：
+        1. 数据量不大
+        2. 键值对形式存在
+        这种情况使用 properties属性文件存储最为合适
+        我们通过stage 以及对应关系 来取得可能性的值
+        这种需求在交易模块 需要大量使用到
+
+        所以我们就需要将改文件解析在服务器缓存中
+        application.setAttribute(Stage2Possibility.properties文件内容);
+
+    */
 	$(function () {
+	var json = {
+
+<%
+			for (String stage:keys){
+
+				String value = pMap.get(stage);
+%>
+			"<%=stage%>":<%=value%>,
+<%
+			}
+%>
+
+	};
+
+		// 时间控件
+		$(".time").datetimepicker({
+			minView: "month",
+			language:  'zh-CN',
+			format: 'yyyy-mm-dd',
+			autoclose: true,
+			todayBtn: true,
+			pickerPosition: "bottom-left"
+		});
+
+
+		// alert(json);
+		// 为阶段变化绑定事件
+		$("#create-transactionStage").change(function () {
+
+
+			// alert($("#create-transactionStage").val());
+			var stage = $("#create-transactionStage").val();
+			// 获取json value 以前是通过 json.key获取
+			// 但是这个key是变化的 不是以前固定的
+			// 需要通过 json[key]形式获取
+			// alert(json[stage]);
+			$("#create-possibility").val(json[stage]);
+
+		});
+
+
+
 		// 自动补全控件
 		$("#create-accountName").typeahead({
 			source: function (query, process) {
@@ -37,16 +103,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			delay: 1500
 		});
 
-
-		// 时间控件
-		$(".time").datetimepicker({
-			minView: "month",
-			language:  'zh-CN',
-			format: 'yyyy-mm-dd',
-			autoclose: true,
-			todayBtn: true,
-			pickerPosition: "bottom-left"
-		});
 
 		// 获取所有内容发送到后端 然后跳回index
 		$("#search-activity-btn").click(function () {
@@ -101,20 +157,21 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 			}
 		});
-		// 给所有者填充选项（ajax从user表获取）
-		$.ajax({
+		// 给所有者填充选项（ajax从user表获取） 实现方式一
+		/*$.ajax({
 			url:"workbench/tran/getUsers.do",
 			dataType:"json",
 			type:"get",
 			success:function (data) {
+				var uid = "${user.id}";
 				var html = "<option></option>";
 				$.each(data,function (index,value) {
-					html += "<option>"+value.name+"</option>";
+					html += "<option value='"+value.id+"'>"+value.name+"</option>";
 
 				});
 				$("#create-transactionOwner").html(html);
 			}
-		});
+		});*/
 
 		// 点击添加市场活动按钮
 		$("#addActBtn").click(function () {
@@ -203,7 +260,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				返回：直接返回index页面
 			*/
 
-			$("#saveTranBtn").submit();
+			$("#create-tran-form").submit();
 
 
 
@@ -312,14 +369,17 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		</div>
 		<hr style="position: relative; top: -40px;">
 	</div>
-	<form class="form-horizontal" role="form" style="position: relative; top: -30px;" id="create-tran-form">
+	<form class="form-horizontal" role="form" style="position: relative; top: -30px;" id="create-tran-form" action="workbench/tran/saveTran.do" method="post">
 		<div class="form-group">
 			<%--	隐藏域 存储添加的市场活动id 和 联系人id--%>
-			<input type="hidden" id="hide-actId" name="activityid">
-			<input type="hidden" id="hide-contactId" name="contactsid">
+
 			<label for="create-transactionOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
 				<select class="form-control" id="create-transactionOwner" name="owner">
+					<option></option>
+					<c:forEach items="${userList}" var="u">
+						<option value="${u.id}" ${u.id eq user.id ? "selected" : ""}>${u.name}</option>
+					</c:forEach>
 				  <%--<option>zhangsan</option>
 				  <option>lisi</option>
 				  <option>wangwu</option>--%>
@@ -345,7 +405,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<div class="form-group">
 			<label for="create-accountName" class="col-sm-2 control-label">客户名称<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-accountName" placeholder="支持自动补全，输入客户不存在则新建">
+				<input type="text" class="form-control" id="create-accountName" name="customerid" placeholder="支持自动补全，输入客户不存在则新建">
 			</div>
 			<label for="create-transactionStage" class="col-sm-2 control-label">阶段<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
@@ -387,6 +447,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<label for="create-activitySrc" class="col-sm-2 control-label">市场活动源&nbsp;&nbsp;<a href="javascript:void(0);" id="search-activity-btn"><span class="glyphicon glyphicon-search"></span></a></label>
 			<div class="col-sm-10" style="width: 300px;">
 				<input type="text" class="form-control" id="create-activitySrc" readonly>
+				<input type="hidden" id="hide-actId" name="activityid">
 			</div>
 		</div>
 		
@@ -394,27 +455,28 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<label for="create-contactsName" class="col-sm-2 control-label">联系人名称&nbsp;&nbsp;<a href="javascript:void(0);" id="search-contact-btn"><span class="glyphicon glyphicon-search"></span></a></label>
 			<div class="col-sm-10" style="width: 300px;">
 				<input type="text" class="form-control" id="create-contactsName" readonly>
+				<input type="hidden" id="hide-contactId" name="contactsid">
 			</div>
 		</div>
 		
 		<div class="form-group">
 			<label for="create-describe" class="col-sm-2 control-label">描述</label>
 			<div class="col-sm-10" style="width: 70%;">
-				<textarea class="form-control" rows="3" id="create-describe"></textarea>
+				<textarea class="form-control" rows="3" id="create-describe" name="description"></textarea>
 			</div>
 		</div>
 		
 		<div class="form-group">
 			<label for="create-contactSummary" class="col-sm-2 control-label">联系纪要</label>
 			<div class="col-sm-10" style="width: 70%;">
-				<textarea class="form-control" rows="3" id="create-contactSummary"></textarea>
+				<textarea class="form-control" rows="3" id="create-contactSummary" name="contactsummary"></textarea>
 			</div>
 		</div>
 		
 		<div class="form-group">
 			<label for="create-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control time" id="create-nextContactTime">
+				<input type="text" class="form-control time" id="create-nextContactTime" name="nextcontacttime">
 			</div>
 		</div>
 		

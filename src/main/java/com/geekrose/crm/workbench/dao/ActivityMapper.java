@@ -35,6 +35,8 @@ public interface ActivityMapper {
 
     List<Activity> selectActivitiesByName(@Param("name") String name);
 
+    List<Activity> getActsByName(String name);
+
 //    List<Activity> selectActsByIds(String[] actIds);
 
 //    List<User> selectUserById(List<String> owners);

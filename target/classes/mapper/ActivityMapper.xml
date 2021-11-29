@@ -119,6 +119,18 @@
     </where>
   </select>
 
+<!--  根据市场活动名称查询id-->
+  <select id="getActsByName" resultType="com.geekrose.crm.workbench.domain.Activity">
+    select
+    <include refid="Act_User_Column"></include>
+    from tbl_activity a
+    inner join tbl_user u
+    on a.owner = u.id
+    where a.name like '%' #{name} '%'
+
+
+  </select>
+
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_activity

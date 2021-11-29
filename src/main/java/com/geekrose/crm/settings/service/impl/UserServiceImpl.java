@@ -11,6 +11,7 @@ import com.geekrose.crm.utils.MD5Util;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author Joker_Dong
@@ -51,4 +52,11 @@ public class UserServiceImpl implements UserService {
 
         return user;
     }
+
+    // 将users表中数据也加入缓存
+    public List<User> getUserList(){
+        List<User> users = dao.selectUserList();
+        return users;
+    }
+
 }

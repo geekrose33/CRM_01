@@ -2,6 +2,8 @@ package com.geekrose.crm.workbench.dao;
 
 import com.geekrose.crm.workbench.domain.TranRemark;
 
+import java.util.List;
+
 public interface TranRemarkMapper {
     int deleteByPrimaryKey(String id);
 
@@ -14,4 +16,6 @@ public interface TranRemarkMapper {
     int updateByPrimaryKeySelective(TranRemark record);
 
     int updateByPrimaryKey(TranRemark record);
+
+    List<String> selectCountsByTranId(String id);
 }

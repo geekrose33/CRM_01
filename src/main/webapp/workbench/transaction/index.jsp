@@ -30,6 +30,27 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			$("input[name=one]").prop("checked",this.checked);
 		});
 
+		// 当点击够所有选择框 全选随着选中
+		$("#tran-list").on("click",$("#input[name=one]"),function () {
+			$("#check-all").prop("checked",$("input[name=one]").length === $("input[name=one]:checked").length);
+		});
+
+
+		// 修改按钮的点击 绑定交易id
+		$("#editTranBtn").click(function () {
+
+			if ($("input[name=one]:checked").length == 1){
+
+				var id = $("input[name=one]:checked").val();
+
+				window.location.href='workbench/transaction/edit.jsp?id='+id;
+
+			}else {
+				alert("请指定交易信息");
+			}
+
+
+		});
 
 		// 条件查询
 		$("#searchBtn").click(function () {
@@ -47,6 +68,44 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			pageList(1,3);
 
 		});
+
+		// 删除按钮
+		$("#removeTranBtn").click(function () {
+
+			var $tran = $("input[name=one]:checked");
+
+			if ($tran.length == 1){
+
+				var id = $tran.val();
+
+				if (confirm("你确定要删除该交易信息吗")){
+
+					$.post(
+							"workbench/tran/removeTran.do",
+							{
+								"id":id
+							},
+							function (data) {
+								if (data.success){
+									// 刷新列表
+									pageList(1,3);
+								}else{
+									alert("删除失败");
+								}
+							},
+							"json"
+					)
+
+				}
+
+			}else {
+				alert("请选择指定交易删除");
+			}
+
+
+
+		});
+
 
 		pageList(1,3);
 	});
@@ -74,7 +133,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 				$.each(data.trans,function (index,value) {
 					html += '<tr>';
-					html += '<td><input type="checkbox" name="one" /></td>';
+					html += '<td><input type="checkbox" name="one" value="'+value.id+'" /></td>';
 					html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/transaction/detail.jsp?id='+value.id+'\';">'+value.name+'</a></td>';
 					// 这里的customerid 为客户名称 需要多表联查
 					html += '<td>'+value.customerid+'</td>';
@@ -99,7 +158,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					rowsPerPage: pageSize, // 每页显示的记录条数
 					maxRowsPerPage: 20, // 每页最多显示的记录条数
 					totalPages: totalPages, // 总页数
-					totalRows: data.total, // 总记录条数
+					totalRows: data.totalCount, // 总记录条数
 
 					visiblePageLinks: 5, // 显示几个卡片
 
@@ -246,8 +305,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 10px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
 				  <button type="button" class="btn btn-primary" onclick="window.location.href='workbench/transaction/save.jsp';"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-				  <button type="button" class="btn btn-default" onclick="window.location.href='workbench/transaction/edit.html';"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button type="button" class="btn btn-default" id="editTranBtn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
+				  <button type="button" class="btn btn-danger" id="removeTranBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				
 				

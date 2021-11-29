@@ -2,12 +2,15 @@ package com.geekrose.crm.settings.service.impl;
 
 import com.geekrose.crm.settings.dao.DicTypeMapper;
 import com.geekrose.crm.settings.dao.DicValueMapper;
+import com.geekrose.crm.settings.dao.UserMapper;
 import com.geekrose.crm.settings.domain.DicType;
 import com.geekrose.crm.settings.domain.DicValue;
+import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.settings.service.DictoryService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +25,7 @@ public class DictoryServiceImpl implements DictoryService {
     private DicTypeMapper typeDao;
     @Resource
     private DicValueMapper valueDao;
+
 
     public Map<String, List<DicValue>> getAll() {
         HashMap<String, List<DicValue>> map = new HashMap<String, List<DicValue>>();
@@ -39,4 +43,6 @@ public class DictoryServiceImpl implements DictoryService {
 
         return map;
     }
+
+
 }

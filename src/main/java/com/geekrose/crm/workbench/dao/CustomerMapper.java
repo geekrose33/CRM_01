@@ -1,6 +1,7 @@
 package com.geekrose.crm.workbench.dao;
 
 import com.geekrose.crm.workbench.domain.Customer;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,4 +21,8 @@ public interface CustomerMapper {
     Customer getCustomerByName(String company);
 
     List<Customer> getCustomersByName(String name);
+
+    List<Customer> getCustomersByCondition(@Param("skipCount") Integer skipCount,@Param("pageSize") Integer pageSize,@Param("cus") Customer customer);
+
+    Integer selectToalCount();
 }

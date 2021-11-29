@@ -2,8 +2,10 @@ package com.geekrose.crm.workbench.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geekrose.crm.settings.domain.User;
+import com.geekrose.crm.utils.DateTimeUtil;
 import com.geekrose.crm.workbench.domain.Activity;
 import com.geekrose.crm.workbench.domain.Contacts;
+import com.geekrose.crm.workbench.domain.Customer;
 import com.geekrose.crm.workbench.domain.Transaction;
 import com.geekrose.crm.workbench.service.ClueService;
 import com.geekrose.crm.workbench.service.ContactsService;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +69,7 @@ public class TranController {
     @RequestMapping("/searchContacts.do")
     @ResponseBody
     public List<Contacts> doSearchContacts(String name){
-        System.out.println("------ name -----" + name);
+
         List<Contacts> cons = conService.getContactsByName(name);
         return cons;
     }
@@ -85,6 +89,89 @@ public class TranController {
     }
 
 
+    @RequestMapping("/saveTran.do")
+    public void doSaveTran(HttpServletRequest request,HttpSession session, HttpServletResponse response, Transaction tran) throws IOException {
+
+        User user = (User)session.getAttribute("user");
+        tran.setCreateby(user.getName());
+        boolean flag = tranService.addTran(tran);
+        if (flag){
+            // 添加操作完成后 重定向 getContextPath 项目名
+            response.sendRedirect(request.getContextPath() + "/workbench/transaction/index.jsp");
+        }
+    }
+
+
+    @RequestMapping("/getTranById.do")
+    @ResponseBody
+    public Transaction doGetTranById(String id){
+
+        Transaction transaction = tranService.getTranById(id);
+
+        return transaction;
+
+    }
+
+    @RequestMapping("/getActsByName.do")
+    @ResponseBody
+    public List<Activity> doGetActsByName(String name){
+
+        List<Activity> list = tranService.getActsByName(name);
+
+        return list;
+    }
+
+    @RequestMapping("/getContactsByName.do")
+    @ResponseBody
+    public List<Contacts> doGetContactsByName(String name){
+
+        List<Contacts> list =tranService.getContactsByName(name);
+
+        return list;
+    }
+
+    @RequestMapping("/editTran.do")
+    public void doEditTran(HttpServletRequest request,HttpServletResponse response,Transaction tran) throws IOException {
+
+        // 设置修改人
+        User user = (User) request.getSession().getAttribute("user");
+        tran.setEditby(user.getName());
+        tran.setEdittime(DateTimeUtil.getSysTime());
+
+        boolean flag = tranService.editTran(tran);
+
+        /*
+            customerid 根据name查询id
+
+            {id='713b4d3447194d36a7adb0fc3c277848', owner='06f5fc056eac41558a964f96daa7f27c', money='666666', name='开发朝阳银行系统001',
+            expecteddate='2021-12-01', customerid='朝阳银行', stage='04确定决策者', type='新业务', source='外部介绍',
+            activityid='92410e358cf242f48b31907d72e116fc', contactsid='c6e1fd9d851341d5befd4d9a7cd7b6c6', createby='null', createtime='null',
+            editby='null', edittime='null',
+            description='jsp：pageContext page request response session application out config exception',
+            contactsummary='jsp：pageContext page request response session application out config exception',
+            nextcontacttime='2021-11-30'}
+        */
+        if (flag == true){
+            // 重定向
+            response.sendRedirect(request.getContextPath() + "/workbench/transaction/index.jsp");
+        }
+
+    }
+
+    @RequestMapping("/removeTran.do")
+    public void doRemoveTran(HttpServletResponse response,String id) throws IOException {
+        boolean success = false;
+        success = tranService.removeTranById(id);
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+
+
+    }
 
 
 

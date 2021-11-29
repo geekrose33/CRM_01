@@ -31,11 +31,20 @@
     co.fullname as contactsId, t.createBy, t.createTime, t.editBy, t.editTime, t.description,t. contactSummary,
     t.nextContactTime
   </sql>
+  <sql id="Tran_User_Cus_Con_Act_List">
+    t.id, u.name as owner, t.money, t.name, t.expectedDate, cu.name as customerId, t.stage, t.type, t.source, a.name as activityId,
+    co.fullname as contactsId, t.createBy, t.createTime, t.editBy, t.editTime, t.description,t. contactSummary,
+    t.nextContactTime
+  </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
-    <include refid="Base_Column_List" />
-    from tbl_tran
-    where id = #{id,jdbcType=CHAR}
+    <include refid="Tran_User_Cus_Con_Act_List"></include>
+    from tbl_tran t
+    inner join tbl_user u on u.id = t.owner
+    inner join tbl_customer as cu on t.customerId = cu.id
+    inner join tbl_contacts as co on t.contactsId = co.id
+    inner join tbl_activity as a on t.activityId = a.id
+    where t.id = #{id,jdbcType=CHAR}
   </select>
 
   <select id="selectTranByName" resultType="int">
@@ -49,7 +58,6 @@
   <select id="getTransByCondition" resultType="com.geekrose.crm.workbench.domain.Transaction">
     select
     <include refid="Tran_User_Cus_Con_List"/>
-    /*t.**/
     from tbl_tran t
     inner join tbl_user u on u.id = t.owner
     inner join tbl_customer as cu on t.customerId = cu.id
@@ -221,58 +229,60 @@
       </if>
     </trim>
   </insert>
+
+
   <update id="updateByPrimaryKeySelective" parameterType="com.geekrose.crm.workbench.domain.Transaction">
     update tbl_tran
     <set>
-      <if test="owner != null">
+      <if test="owner != null and owner != ''">
         owner = #{owner,jdbcType=CHAR},
       </if>
-      <if test="money != null">
+      <if test="money != null and money != ''">
         money = #{money,jdbcType=VARCHAR},
       </if>
-      <if test="name != null">
+      <if test="name != null and name != ''">
         name = #{name,jdbcType=VARCHAR},
       </if>
-      <if test="expecteddate != null">
+      <if test="expecteddate != null and expecteddate != ''">
         expectedDate = #{expecteddate,jdbcType=CHAR},
       </if>
-      <if test="customerid != null">
+      <if test="customerid != null and customerid != ''">
         customerId = #{customerid,jdbcType=CHAR},
       </if>
-      <if test="stage != null">
+      <if test="stage != null and stage != ''">
         stage = #{stage,jdbcType=VARCHAR},
       </if>
-      <if test="type != null">
+      <if test="type != null and type != ''">
         type = #{type,jdbcType=VARCHAR},
       </if>
-      <if test="source != null">
+      <if test="source != null and source != ''">
         source = #{source,jdbcType=VARCHAR},
       </if>
-      <if test="activityid != null">
+      <if test="activityid != null and activityid != ''">
         activityId = #{activityid,jdbcType=CHAR},
       </if>
-      <if test="contactsid != null">
+      <if test="contactsid != null and contactsid != ''">
         contactsId = #{contactsid,jdbcType=CHAR},
       </if>
-      <if test="createby != null">
+      <if test="createby != null and createby != ''">
         createBy = #{createby,jdbcType=VARCHAR},
       </if>
-      <if test="createtime != null">
+      <if test="createtime != null and createtime != ''">
         createTime = #{createtime,jdbcType=CHAR},
       </if>
-      <if test="editby != null">
+      <if test="editby != null and editby != ''">
         editBy = #{editby,jdbcType=VARCHAR},
       </if>
-      <if test="edittime != null">
+      <if test="edittime != null and edittime != ''">
         editTime = #{edittime,jdbcType=CHAR},
       </if>
-      <if test="description != null">
+      <if test="description != null and description != ''">
         description = #{description,jdbcType=VARCHAR},
       </if>
-      <if test="contactsummary != null">
+      <if test="contactsummary != null and contactsummary != ''">
         contactSummary = #{contactsummary,jdbcType=VARCHAR},
       </if>
-      <if test="nextcontacttime != null">
+      <if test="nextcontacttime != null and nextcontacttime != ''">
         nextContactTime = #{nextcontacttime,jdbcType=CHAR},
       </if>
     </set>

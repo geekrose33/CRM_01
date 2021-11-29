@@ -20,6 +20,10 @@
     id, owner, name, website, phone, createBy, createTime, editBy, editTime, contactSummary, 
     nextContactTime, description, address
   </sql>
+  <sql id="Customer_User_List">
+    cu.id, u.name as owner, cu.name, cu.website, cu.phone, cu.createBy, cu.createTime, cu.editBy, cu.editTime, cu.contactSummary,
+    cu.nextContactTime, cu.description, cu.address
+  </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -37,6 +41,38 @@
     select <include refid="Base_Column_List"></include>
     from tbl_customer
     where name like '%' #{name} '%'
+  </select>
+
+<!--  条件查询 + 分页-->
+  <select id="getCustomersByCondition" resultMap="BaseResultMap">
+    select
+    <include refid="Customer_User_List"></include>
+    from tbl_customer cu
+    inner join tbl_user u on cu.owner = u.id
+    <where>
+        <if test="cus.name != null and cus.name != ''">
+          and cu.name like '%' #{cus.name} '%'
+        </if>
+      <if test="cus.owner != null and cus.owner != ''">
+        and u.name like '%' #{cus.owner} '%'
+      </if>
+      <if test="cus.phone != null and cus.phone != ''">
+        and cu.phone like '%' #{cus.phone} '%'
+      </if>
+      <if test="cus.website != null and cus.website != ''">
+        and cu.website like '%' #{cus.website} '%'
+      </if>
+    </where>
+    order by cu.createTime desc
+    limit #{skipCount},#{pageSize}
+  </select>
+
+<!--  查询总记录数-->
+  <select id="selectToalCount" resultType="int">
+    select
+    count(*)
+    from
+    tbl_customer
   </select>
 
 
