@@ -26,9 +26,10 @@
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
-    <include refid="Base_Column_List" />
-    from tbl_customer
-    where id = #{id,jdbcType=CHAR}
+    <include refid="Customer_User_List" />
+    from tbl_customer cu
+    inner join tbl_user u on cu.owner = u.id
+    where cu.id = #{id,jdbcType=CHAR}
   </select>
 
   <select id="getCustomerByName" parameterType="java.lang.String" resultMap="BaseResultMap">

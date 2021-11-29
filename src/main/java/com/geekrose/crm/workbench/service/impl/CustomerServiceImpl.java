@@ -1,5 +1,6 @@
 package com.geekrose.crm.workbench.service.impl;
 
+import com.geekrose.crm.utils.DateTimeUtil;
 import com.geekrose.crm.utils.UUIDUtil;
 import com.geekrose.crm.workbench.dao.CustomerMapper;
 import com.geekrose.crm.workbench.domain.Customer;
@@ -49,6 +50,28 @@ public class CustomerServiceImpl implements CustomerService {
         int i = cusDao.insertSelective(customer);
 
         if (i == 1){
+            return true;
+        }
+
+        return false;
+    }
+
+    public Customer getCustomerById(String id) {
+
+        Customer customer = cusDao.selectByPrimaryKey(id);
+
+        return customer;
+    }
+
+
+    @Transactional
+    public boolean editCustomer(Customer customer) {
+
+        customer.setEdittime(DateTimeUtil.getSysTime());
+
+        int count = cusDao.updateByPrimaryKeySelective(customer);
+
+        if (count == 1){
             return true;
         }
 

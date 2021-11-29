@@ -71,4 +71,42 @@ public class CusController {
 
     }
 
+
+    @RequestMapping("/getCustomerById.do")
+    @ResponseBody
+    public Customer doGetCustomerById(String id){
+
+        Customer customer = cusService.getCustomerById(id);
+
+        return customer;
+    }
+
+    @RequestMapping("/editCustomer.do")
+    public void doEditCustomer(HttpSession session,HttpServletResponse response,Customer customer) throws IOException {
+
+        System.out.println("--------customer-------" + customer);
+        /*
+            --------customer-------
+            Customer{id='ec88298e624b47579988fee1cf43f443', owner='王二麻子', name='百度',
+            website='www.baidu.com', phone='9999999999', createby='null', createtime='null', editby='null', edittime='null',
+            contactsummary='jsp：pageContext、page、request、response、session、application、config、out、exception',
+            nextcontacttime='2021-12-01', description='搜索引擎、人工智能', address=''}
+        */
+        User user = (User) session.getAttribute("user");
+        customer.setEditby(user.getName());
+
+        boolean success = cusService.editCustomer(customer);
+
+        System.out.println("---------success---------" + success);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+
+        response.getWriter().print(json);
+
+    }
+
 }

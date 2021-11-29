@@ -10,4 +10,8 @@ public interface CustomerService {
     Integer getTotalCount();
 
     boolean saveCustomer(Customer customer);
+
+    Customer getCustomerById(String id);
+
+    boolean editCustomer(Customer customer);
 }

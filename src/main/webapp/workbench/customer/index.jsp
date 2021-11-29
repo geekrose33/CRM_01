@@ -104,7 +104,29 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			var $customer = $("input[name=customer]:checked");
 			if ($customer.length == 1){
 
-				$("#editCustomerModal").modal("show");
+				var id = $("input[name=customer]:checked").val();
+				// 提前铺好数据
+				$.get(
+						"workbench/cus/getCustomerById.do",
+						{
+							"id":id
+						},
+						function (data) {
+							// 返回一个customer对象
+							$("#edit-customerOwner").val(data.owner);
+							$("#edit-customerName").val(data.name);
+							$("#edit-phone").val(data.phone);
+							$("#edit-website").val(data.website);
+							$("#edit-describe").val(data.description);
+							$("#edit-contactSummary").val(data.contactsummary);
+							$("#edit-nextContactTime").val(data.nextcontacttime);
+							$("#edit-address").val(data.address);
+
+							// 打开模态窗口
+							$("#editCustomerModal").modal("show");
+						},
+						"json"
+				);
 
 			}else{
 				alert("请选择指定客户进行修改");
@@ -116,11 +138,20 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 			var id = $("input[name=customer]:checked").val();
 
+			var owner = $("option[name=user]:selected")[0].id;
+
 			$.post(
 					"workbench/cus/editCustomer.do",
 					{
 						"id":id,
-
+						"owner":owner,
+						"name":$.trim($("#edit-customerName").val()),
+						"phone":$.trim($("#edit-phone").val()),
+						"website":$.trim($("#edit-website").val()),
+						"description":$.trim($("#edit-describe").val()),
+						"contactsummary":$.trim($("#edit-contactSummary").val()),
+						"nextcontacttime":$.trim($("#edit-nextContactTime").val()),
+						"address":$.trim($("#edit-address").val())
 					},
 					function (data) {
 						// success
@@ -130,8 +161,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 							// 关闭模态窗口
 							$("#editCustomerModal").modal("hide");
+
+						}else{
+							alert("修改失败");
 						}
-					}
+					},
+					"json"
 			)
 
 
@@ -174,7 +209,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 						html += '<tr>';
 						html += '<td><input type="checkbox" name="customer" value="'+value.id+'"/></td>';
-						html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'detail.jsp?id='+value.id+'\';">'+value.name+'</a></td>';
+						html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/customer/detail.jsp?id='+value.id+'\';">'+value.name+'</a></td>';
 						// 与user表联查
 						html += '<td>'+value.owner+'</td>';
 						html += '<td>'+value.phone+'</td>';
@@ -319,9 +354,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<label for="edit-customerOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-customerOwner">
-								  <option>zhangsan</option>
-								  <option>lisi</option>
-								  <option>wangwu</option>
+								  <c:forEach items="${userList}" var="u">
+									  <option id="${u.id}" name="user">${u.name}</option>
+								  </c:forEach>
 								</select>
 							</div>
 							<label for="edit-customerName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
@@ -352,15 +387,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
                         <div style="position: relative;top: 15px;">
                             <div class="form-group">
-                                <label for="create-contactSummary1" class="col-sm-2 control-label">联系纪要</label>
+                                <label for="edit-contactSummary" class="col-sm-2 control-label">联系纪要</label>
                                 <div class="col-sm-10" style="width: 81%;">
-                                    <textarea class="form-control" rows="3" id="create-contactSummary1"></textarea>
+                                    <textarea class="form-control" rows="3" id="edit-contactSummary"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="create-nextContactTime2" class="col-sm-2 control-label">下次联系时间</label>
+                                <label for="edit-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
                                 <div class="col-sm-10" style="width: 300px;">
-                                    <input type="text" class="form-control time" id="create-nextContactTime2">
+                                    <input type="text" class="form-control time" id="edit-nextContactTime">
                                 </div>
                             </div>
                         </div>
@@ -369,9 +404,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
                         <div style="position: relative;top: 20px;">
                             <div class="form-group">
-                                <label for="create-address" class="col-sm-2 control-label">详细地址</label>
+                                <label for="edit-address" class="col-sm-2 control-label">详细地址</label>
                                 <div class="col-sm-10" style="width: 81%;">
-                                    <textarea class="form-control" rows="1" id="create-address">北京大兴大族企业湾</textarea>
+                                    <textarea class="form-control" rows="1" id="edit-address">北京大兴大族企业湾</textarea>
                                 </div>
                             </div>
                         </div>
@@ -460,20 +495,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 						</tr>
 					</thead>
 					<tbody id="customer-list">
-						<%--<tr>
-							<td><input type="checkbox" /></td>
-							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">动力节点</a></td>
-							<td>zhangsan</td>
-							<td>010-84846003</td>
-							<td>http://www.bjpowernode.com</td>
-						</tr>
-                        <tr class="active">
-                            <td><input type="checkbox" /></td>
-                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">动力节点</a></td>
-                            <td>zhangsan</td>
-                            <td>010-84846003</td>
-                            <td>http://www.bjpowernode.com</td>
-                        </tr>--%>
+
 					</tbody>
 				</table>
 			</div>
@@ -482,38 +504,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 				<div id="customer-pagination"></div>
 
-				<%--<div>
-					<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
-				</div>
-				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							10
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">20</a></li>
-							<li><a href="#">30</a></li>
-						</ul>
-					</div>
-					<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-				</div>
-				<div style="position: relative;top: -88px; left: 285px;">
-					<nav>
-						<ul class="pagination">
-							<li class="disabled"><a href="#">首页</a></li>
-							<li class="disabled"><a href="#">上一页</a></li>
-							<li class="active"><a href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">4</a></li>
-							<li><a href="#">5</a></li>
-							<li><a href="#">下一页</a></li>
-							<li class="disabled"><a href="#">末页</a></li>
-						</ul>
-					</nav>
-				</div>--%>
+
 			</div>
 			
 		</div>
