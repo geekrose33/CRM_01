@@ -3,14 +3,18 @@ package com.geekrose.crm.workbench.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.utils.DateTimeUtil;
+import com.geekrose.crm.workbench.domain.Contacts;
 import com.geekrose.crm.workbench.domain.Customer;
+import com.geekrose.crm.workbench.domain.CustomerRemark;
 import com.geekrose.crm.workbench.service.CustomerService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -108,5 +112,91 @@ public class CusController {
         response.getWriter().print(json);
 
     }
+
+    @RequestMapping("/removeCustomer.do")
+    public void doRemoveCustomer(HttpServletResponse response,String id) throws IOException {
+
+        boolean success = cusService.removeCustomer(id);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+
+    }
+
+    @RequestMapping("/useCusInfo.do")
+    @ResponseBody
+    public ModelAndView doUseCusInfo(String id){
+
+        ModelAndView mv = new ModelAndView();
+
+        // 获取 客户数据
+        Customer customer = cusService.getCustomerById(id);
+        mv.addObject("customer",customer);
+
+        // 获取联系人数据
+        Contacts contact = cusService.getContactByCusId(id);
+        mv.addObject("contact",contact);
+        // 转发
+        mv.setViewName("forward:/workbench/customer/detail.jsp");
+
+        return mv;
+
+    }
+
+    @RequestMapping("/getCusRemark.do")
+    @ResponseBody
+    public List<CustomerRemark> doGetCusRemark(String id){
+
+        List<CustomerRemark> remarks = cusService.getRemarksByCusId(id);
+
+        return remarks;
+    }
+
+
+    @RequestMapping("/editRemark.do")
+    public void doEditRemark(CustomerRemark remark, HttpServletResponse response, HttpSession session) throws IOException {
+
+        User user = (User) session.getAttribute("user");
+        remark.setEditby(user.getName());
+        boolean success = cusService.editCusRemark(remark);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+
+    }
+
+    @RequestMapping("/removeRemark.do")
+    public void doRemoveRemark(HttpServletResponse response,String id) throws IOException {
+
+        boolean success = cusService.removeCusRemark(id);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+
+    }
+
+    @RequestMapping("/addRemark.do")
+    public void doAddRemark(HttpSession session,HttpServletResponse response,CustomerRemark remark) throws IOException {
+
+        User user = (User) session.getAttribute("user");
+        remark.setCreateby(user.getName());
+        boolean success = cusService.addRemark(remark);
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+    }
+
 
 }

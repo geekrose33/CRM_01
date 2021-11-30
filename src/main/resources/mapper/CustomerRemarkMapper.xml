@@ -20,6 +20,21 @@
     from tbl_customer_remark
     where id = #{id,jdbcType=CHAR}
   </select>
+
+  <select id="selectIdsByCusId" resultType="String">
+    select
+    id
+    from tbl_customer_remark
+    where customerId = #{id}
+  </select>
+
+  <select id="selectRemarksByCusId" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_customer_remark
+    where customerId = #{id}
+    order by createTime desc
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_customer_remark
     where id = #{id,jdbcType=CHAR}

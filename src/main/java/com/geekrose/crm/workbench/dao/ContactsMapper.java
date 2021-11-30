@@ -19,4 +19,6 @@ public interface ContactsMapper {
     int updateByPrimaryKey(Contacts record);
 
     List<Contacts> getContactByName(/*@Param("name") */String name);
+
+    Contacts getContactByCusId(String cusId);
 }

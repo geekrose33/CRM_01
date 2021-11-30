@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -10,8 +11,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <meta charset="UTF-8">
 
 <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
+	<link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
+
+	<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
 
 <script type="text/javascript">
 
@@ -19,6 +24,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	var cancelAndSaveBtnDefault = true;
 	
 	$(function(){
+		// 时间控件
+		$(".time").datetimepicker({
+			minView: "month",
+			language:  'zh-CN',
+			format: 'yyyy-mm-dd',
+			autoclose: true,
+			todayBtn: true,
+			pickerPosition: "top-left"
+		});
+
 		$("#remark").focus(function(){
 			if(cancelAndSaveBtnDefault){
 				//设置remarkDiv的高度为130px
@@ -52,7 +67,188 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		$(".myHref").mouseout(function(){
 			$(this).children("span").css("color","#E6E6E6");
 		});
+
+		// 修改客户备注
+		$("#updateRemarkBtn").click(function () {
+			var id = $("#remarkId").val();
+			var notecontent = $("#noteContent").val();
+
+			$.post(
+					"workbench/cus/editRemark.do",
+					{
+						"id":id,
+						"notecontent":notecontent
+					},
+					function (data) {
+						if (data.success){
+							// 刷新列表
+							getCusRemark("${param.id}");
+							// 关闭模态窗口
+							$("#editRemarkModal").modal("hide");
+						}else{
+							alert("修改备注失败");
+						}
+					},
+					"json"
+			)
+
+		});
+
+		// 添加备注
+		$("#addRemarkBtn").click(function () {
+			var cusId = "${param.id}";
+			$.post(
+					"workbench/cus/addRemark.do",
+					{
+						"notecontent":$.trim($("#remark").val()),
+						"customerid":cusId
+					},
+					function (data) {
+
+						if (data.success){
+							// 刷新输入框
+							$("#remark").val("");
+
+							// 刷新列表
+							getCusRemark(cusId);
+						}else{
+							alert("添加备注失败");
+						}
+
+					},
+					"json"
+			)
+
+		});
+
+
+		// 添加联系人
+
+		$("#create-contact-btn").click(function () {
+
+			// 自动填充客户名称
+			$("#create-customerName").val("${customer.name}");
+
+			// 展开模态窗口
+			$("#createContactsModal").modal("show");
+
+
+		});
+
+		// 给保存联系人按钮绑定事件
+		$("#create-contact-btn-do").click(function () {
+
+			$.post(
+					"workbench/cus/createContact.do",
+					{
+						"owner":$.trim($("#create-contactsOwner").val())
+					},
+					function (data) {
+						if (data.success){
+							// 刷新添加 输入框
+
+							// 刷新列表
+
+							// 关闭模态窗口
+							$("#createContactsModal").modal("hide");
+						}else{
+							alert("添加失败");
+						}
+					},
+					"json"
+			)
+
+		});
+
+
+		// 删除联系人
+
+
+
+		// 删除和修改备注特效
+		$("#remark-list").on("mouseover",".remarkDiv",function(){
+			$(this).children("div").children("div").show();
+		});
+		$("#remark-list").on("mouseout",".remarkDiv",function(){
+			$(this).children("div").children("div").hide();
+		});
+
+
+		// 刷新备注信息
+		getCusRemark("${param.id}");
+
 	});
+	/*
+		动态生成的标签内容 不能直接绑定事件...
+	*/
+	// 修改备注
+	function editRemark(id) {
+		// alert(id);
+		var html = $.trim($("#h"+id).html());
+
+		// 保存id
+		$("#remarkId").val(id);
+
+		// alert (html);
+		// 将数据铺好
+		$("#noteContent").val(html);
+
+		// 打开模态窗口
+		$("#editRemarkModal").modal("show");
+	}
+
+	// 删除备注
+	function removeRemark(id) {
+		$.post(
+				"workbench/cus/removeRemark.do",
+				{
+					"id":id
+				},
+				function (data) {
+					if (data.success){
+						// 刷新
+						getCusRemark("${param.id}");
+					}else{
+						alert("删除备注失败");
+					}
+				},
+				"json"
+		)
+	}
+
+	function getCusRemark(id) {
+
+		$.get(
+				"workbench/cus/getCusRemark.do",
+				{
+					"id":id
+				},
+				function (data) {
+					// 返回 remarks
+					// 填充详细信息
+					var html = "";
+					$.each(data,function (index,value) {
+						html += '<div class="remarkDiv" style="height: 60px;">';
+						html += '<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
+						html += '<div style="position: relative; top: -40px; left: 40px;" >';
+						html += '<h5 id="h'+value.id+'">'+value.notecontent+'</h5>';
+						html += '<font color="gray">联系人</font> <font color="gray">-</font> <b>${contact.fullname}${contact.job}-${customer.name}</b> <small style="color: gray;"> '+(value.editflag == "0"? value.createtime : value.edittime)+' 由 '+(value.editflag == "0"? value.createby : value.editby)+'</small>';
+						html += '<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">';
+						html += '<a class="myHref" href="javascript:void(0);" onclick="editRemark(\''+value.id+'\')"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #FF0000;"></span></a>';
+						html += '&nbsp;&nbsp;&nbsp;&nbsp;';
+						html += '<a class="myHref" href="javascript:void(0);" onclick="removeRemark(\''+value.id+'\')"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #FF0000;"></span></a>';
+						html += '</div>';
+						html += '</div>';
+						html += '</div>';
+
+					});
+					$("#remark-list").html(html);
+
+				},
+				"json"
+		)
+
+	}
 	
 </script>
 
@@ -118,29 +314,19 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<label for="create-contactsOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-contactsOwner">
-								  <option>zhangsan</option>
-								  <option>lisi</option>
-								  <option>wangwu</option>
+								  <option></option>
+									<c:forEach items="${userList}" var="u">
+										<option value="${u.id}" ${user.id eq u.id ? "selected" : ""}>${u.name}</option>
+									</c:forEach>
 								</select>
 							</div>
 							<label for="create-clueSource" class="col-sm-2 control-label">来源</label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-clueSource">
 								  <option></option>
-								  <option>广告</option>
-								  <option>推销电话</option>
-								  <option>员工介绍</option>
-								  <option>外部介绍</option>
-								  <option>在线商场</option>
-								  <option>合作伙伴</option>
-								  <option>公开媒介</option>
-								  <option>销售邮件</option>
-								  <option>合作伙伴研讨会</option>
-								  <option>内部研讨会</option>
-								  <option>交易会</option>
-								  <option>web下载</option>
-								  <option>web调研</option>
-								  <option>聊天</option>
+								  <c:forEach items="${sourceList}" var="s">
+									  <option>${s.text}</option>
+								  </c:forEach>
 								</select>
 							</div>
 						</div>
@@ -154,11 +340,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-call">
 								  <option></option>
-								  <option>先生</option>
-								  <option>夫人</option>
-								  <option>女士</option>
-								  <option>博士</option>
-								  <option>教授</option>
+								  <c:forEach items="${appellationList}" var="a">
+									  <option>${a.text}</option>
+								  </c:forEach>
 								</select>
 							</div>
 							
@@ -182,14 +366,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							</div>
 							<label for="create-birth" class="col-sm-2 control-label">生日</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-birth">
+								<input type="text" class="form-control time" id="create-birth">
 							</div>
 						</div>
 						
 						<div class="form-group" style="position: relative;">
 							<label for="create-customerName" class="col-sm-2 control-label">客户名称</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建">
+								<input type="text" class="form-control" id="create-customerName" placeholder="客户锁死本页面客户" readonly>
+								<input type="hidden" id="hide-customer-id">
 							</div>
 						</div>
 						
@@ -206,13 +391,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                             <div class="form-group">
                                 <label for="edit-contactSummary" class="col-sm-2 control-label">联系纪要</label>
                                 <div class="col-sm-10" style="width: 81%;">
-                                    <textarea class="form-control" rows="3" id="edit-contactSummary">这个线索即将被转换</textarea>
+                                    <textarea class="form-control" rows="3" id="edit-contactSummary"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="edit-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
                                 <div class="col-sm-10" style="width: 300px;">
-                                    <input type="text" class="form-control" id="edit-nextContactTime" value="2017-05-01">
+                                    <input type="text" class="form-control time" id="edit-nextContactTime">
                                 </div>
                             </div>
                         </div>
@@ -223,7 +408,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                             <div class="form-group">
                                 <label for="edit-address1" class="col-sm-2 control-label">详细地址</label>
                                 <div class="col-sm-10" style="width: 81%;">
-                                    <textarea class="form-control" rows="1" id="edit-address1">北京大兴区大族企业湾</textarea>
+                                    <textarea class="form-control" rows="1" id="edit-address1"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -232,7 +417,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">保存</button>
+					<button type="button" class="btn btn-primary" id="create-contact-btn-do">保存</button>
 				</div>
 			</div>
 		</div>
@@ -330,7 +515,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<!-- 大标题 -->
 	<div style="position: relative; left: 40px; top: -30px;">
 		<div class="page-header">
-			<h3>动力节点 <small><a href="http://www.bjpowernode.com" target="_blank">http://www.bjpowernode.com</a></small></h3>
+			<h3>${customer.name} <small><a href="http://www.bjpowernode.com" target="_blank">${customer.website}</a></small></h3>
 		</div>
 		<div style="position: relative; height: 50px; width: 500px;  top: -72px; left: 700px;">
 			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#editCustomerModal"><span class="glyphicon glyphicon-edit"></span> 编辑</button>
@@ -342,49 +527,49 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<div style="position: relative; top: -70px;">
 		<div style="position: relative; left: 40px; height: 30px;">
 			<div style="width: 300px; color: gray;">所有者</div>
-			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>zhangsan</b></div>
+			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>${customer.owner}</b></div>
 			<div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">名称</div>
-			<div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>动力节点</b></div>
+			<div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>${customer.name}</b></div>
 			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
 			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
 		</div>
 		<div style="position: relative; left: 40px; height: 30px; top: 10px;">
 			<div style="width: 300px; color: gray;">公司网站</div>
-			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>http://www.bjpowernode.com</b></div>
+			<div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>${customer.website}</b></div>
 			<div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">公司座机</div>
-			<div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>010-84846003</b></div>
+			<div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>${customer.phone}</b></div>
 			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
 			<div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
 		</div>
 		<div style="position: relative; left: 40px; height: 30px; top: 20px;">
 			<div style="width: 300px; color: gray;">创建者</div>
-			<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>zhangsan&nbsp;&nbsp;</b><small style="font-size: 10px; color: gray;">2017-01-18 10:10:10</small></div>
+			<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${customer.createby}&nbsp;&nbsp;</b><small style="font-size: 10px; color: gray;">${customer.createtime}</small></div>
 			<div style="height: 1px; width: 550px; background: #D5D5D5; position: relative; top: -20px;"></div>
 		</div>
 		<div style="position: relative; left: 40px; height: 30px; top: 30px;">
 			<div style="width: 300px; color: gray;">修改者</div>
-			<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>zhangsan&nbsp;&nbsp;</b><small style="font-size: 10px; color: gray;">2017-01-19 10:10:10</small></div>
+			<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${customer.editby}&nbsp;&nbsp;</b><small style="font-size: 10px; color: gray;">${customer.edittime}</small></div>
 			<div style="height: 1px; width: 550px; background: #D5D5D5; position: relative; top: -20px;"></div>
 		</div>
         <div style="position: relative; left: 40px; height: 30px; top: 40px;">
             <div style="width: 300px; color: gray;">联系纪要</div>
             <div style="width: 630px;position: relative; left: 200px; top: -20px;">
                 <b>
-                    这条线索即将被转换
+					${customer.contactsummary}
                 </b>
             </div>
             <div style="height: 1px; width: 850px; background: #D5D5D5; position: relative; top: -20px;"></div>
         </div>
         <div style="position: relative; left: 40px; height: 30px; top: 50px;">
             <div style="width: 300px; color: gray;">下次联系时间</div>
-            <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>2017-05-01</b></div>
+            <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>${customer.nextcontacttime}</b></div>
             <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -20px; "></div>
         </div>
 		<div style="position: relative; left: 40px; height: 30px; top: 60px;">
 			<div style="width: 300px; color: gray;">描述</div>
 			<div style="width: 630px;position: relative; left: 200px; top: -20px;">
 				<b>
-					这是一条线索的描述信息
+					${customer.description}
 				</b>
 			</div>
 			<div style="height: 1px; width: 850px; background: #D5D5D5; position: relative; top: -20px;"></div>
@@ -393,20 +578,23 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             <div style="width: 300px; color: gray;">详细地址</div>
             <div style="width: 630px;position: relative; left: 200px; top: -20px;">
                 <b>
-                    北京大兴大族企业湾
+					${customer.address}
                 </b>
             </div>
             <div style="height: 1px; width: 850px; background: #D5D5D5; position: relative; top: -20px;"></div>
         </div>
 	</div>
-	
+
+
 	<!-- 备注 -->
 	<div style="position: relative; top: 10px; left: 40px;">
 		<div class="page-header">
 			<h4>备注</h4>
 		</div>
-		
-		<!-- 备注1 -->
+
+		<div id="remark-list"></div>
+
+		<%--<!-- 备注1 -->
 		<div class="remarkDiv" style="height: 60px;">
 			<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
 			<div style="position: relative; top: -40px; left: 40px;" >
@@ -419,7 +607,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				</div>
 			</div>
 		</div>
-		
+
 		<!-- 备注2 -->
 		<div class="remarkDiv" style="height: 60px;">
 			<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
@@ -432,16 +620,46 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>
 				</div>
 			</div>
-		</div>
-		
+		</div>--%>
+
 		<div id="remarkDiv" style="background-color: #E6E6E6; width: 870px; height: 90px;">
 			<form role="form" style="position: relative;top: 10px; left: 10px;">
 				<textarea id="remark" class="form-control" style="width: 850px; resize : none;" rows="2"  placeholder="添加备注..."></textarea>
 				<p id="cancelAndSaveBtn" style="position: relative;left: 737px; top: 10px; display: none;">
 					<button id="cancelBtn" type="button" class="btn btn-default">取消</button>
-					<button type="button" class="btn btn-primary">保存</button>
+					<button type="button" class="btn btn-primary" id="addRemarkBtn">保存</button>
 				</p>
 			</form>
+		</div>
+	</div>
+
+	<!-- 修改备注的模态窗口 -->
+	<div class="modal fade" id="editRemarkModal" role="dialog">
+		<%-- 备注的id --%>
+		<input type="hidden" id="remarkId">
+		<div class="modal-dialog" role="document" style="width: 40%;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">修改备注</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="edit-describe" class="col-sm-2 control-label">内容</label>
+							<div class="col-sm-10" style="width: 81%;">
+								<textarea class="form-control" rows="3" id="noteContent"></textarea>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" id="updateRemarkBtn">更新</button>
+				</div>
+			</div>
 		</div>
 	</div>
 	
@@ -505,14 +723,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<td><a href="contacts/detail.jsp" style="text-decoration: none;">李四</a></td>
 							<td>lisi@bjpowernode.com</td>
 							<td>13543645364</td>
-							<td><a href="javascript:void(0);" data-toggle="modal" data-target="#removeContactsModal" style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>删除</a></td>
+							<td><a href="javascript:void(0);" id="remove-contact-btn" style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>删除</a></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 			
 			<div>
-				<a href="javascript:void(0);" data-toggle="modal" data-target="#createContactsModal" style="text-decoration: none;"><span class="glyphicon glyphicon-plus"></span>新建联系人</a>
+				<a href="javascript:void(0);" id="create-contact-btn" style="text-decoration: none;"><span class="glyphicon glyphicon-plus"></span>新建联系人</a>
 			</div>
 		</div>
 	</div>

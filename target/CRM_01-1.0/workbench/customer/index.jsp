@@ -86,6 +86,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							// 刷新
 							pageList(1,3);
 
+							// 创建完成后把输入框的数据刷新
+							$("#create-customerName").val("");
+							$("#create-website").val("");
+							$("#create-phone").val("");
+							$("#create-describe").val("");
+							$("#create-contactSummary").val("");
+							$("#create-nextContactTime").val("");
+							$("#create-address").val("");
+
 							// 关闭模态窗口
 							$("#createCustomerModal").modal("hide");
 						}else{
@@ -172,6 +181,43 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 		});
 
+		// 删除客户
+		$("#remove-customer-btn").click(function () {
+
+			var $customer = $("input[name=customer]:checked");
+
+			if ($customer.length == 1){
+
+			    if (confirm("确定要删除该客户信息吗")){
+			        var id = $customer.val();
+			        $.post(
+			            "workbench/cus/removeCustomer.do",
+                        {
+                            "id":id
+                        },
+                        function (data) {
+                            if (data.success){
+                                // 刷新页面
+                                pageList(1,3);
+                            }else {
+                                alert("删除失败");
+                            }
+                        },
+						"json"
+                    )
+
+
+                }
+
+
+            }else{
+			    alert("请选择指定客户信息进行删除");
+            }
+
+
+
+		});
+
 
 		// 正选反选
 		$("#check-all").click(function () {
@@ -209,7 +255,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 						html += '<tr>';
 						html += '<td><input type="checkbox" name="customer" value="'+value.id+'"/></td>';
-						html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/customer/detail.jsp?id='+value.id+'\';">'+value.name+'</a></td>';
+						html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/cus/useCusInfo.do?id='+value.id+'\';">'+value.name+'</a></td>';
 						// 与user表联查
 						html += '<td>'+value.owner+'</td>';
 						html += '<td>'+value.phone+'</td>';
@@ -479,7 +525,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<div class="btn-group" style="position: relative; top: 18%;">
 				  <button type="button" class="btn btn-primary" id="create-customer-btn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" id="edit-customer-btn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button type="button" class="btn btn-danger" id="remove-customer-btn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				
 			</div>

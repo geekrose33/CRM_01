@@ -40,6 +40,12 @@
     where fullname like '%' #{name} '%'
   </select>
 
+<!--  根据客户id查询联系人-->
+  <select id="getContactByCusId" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_contacts
+    where customerId = #{cusId}
+  </select>
 
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
