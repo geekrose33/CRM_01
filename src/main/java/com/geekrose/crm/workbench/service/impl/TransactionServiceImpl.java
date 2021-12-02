@@ -235,4 +235,45 @@ public class TransactionServiceImpl implements TransactionService {
 
         return flag;
     }
+
+    public Transaction getDetailInfoById(String id) {
+
+        Transaction transaction = tranDao.selectDetailInfoById(id);
+        return transaction;
+    }
+
+    public List<TranHistory> getHisListByTranId(String tranId) {
+
+        List<TranHistory> list = tranHisDao.selectByTranId(tranId);
+
+        return list;
+    }
+
+    @Transactional
+    public boolean changeStage(Transaction transaction) {
+        boolean flag = true;
+        transaction.setEdittime(DateTimeUtil.getSysTime());
+
+        int editCount = tranDao.updateByPrimaryKeySelective(transaction);
+        if (editCount != 1){
+            // 修改失败
+            flag = false;
+        }else{
+            // 修改成功 - 添加历史
+            TranHistory history = new TranHistory();
+            history.setId(UUIDUtil.getUUID());
+            history.setCreateby(transaction.getEditby());
+            history.setCreatetime(DateTimeUtil.getSysTime());
+            history.setExpecteddate(transaction.getExpecteddate());
+            history.setMoney(transaction.getMoney());
+            history.setStage(transaction.getStage());
+            history.setTranid(transaction.getId());
+            // 添加历史
+            int hisCount = tranHisDao.insert(history);
+            if (hisCount != 1){
+                flag = false;
+            }
+        }
+        return flag;
+    }
 }

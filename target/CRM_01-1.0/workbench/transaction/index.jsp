@@ -134,7 +134,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				$.each(data.trans,function (index,value) {
 					html += '<tr>';
 					html += '<td><input type="checkbox" name="one" value="'+value.id+'" /></td>';
-					html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/transaction/detail.jsp?id='+value.id+'\';">'+value.name+'</a></td>';
+					html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/tran/detail.do?id='+value.id+'\';">'+value.name+'</a></td>';
 					// 这里的customerid 为客户名称 需要多表联查
 					html += '<td>'+value.customerid+'</td>';
 					html += '<td>'+value.stage+'</td>';

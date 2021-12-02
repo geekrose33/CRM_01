@@ -197,6 +197,55 @@ public class CusController {
         String json = mapper.writeValueAsString(map);
         response.getWriter().print(json);
     }
+    // 详情页刷新联系人列表
+    @RequestMapping("/getContactsByCusId.do")
+    @ResponseBody
+    public List<Contacts> doGetContactsByCusId(String customerId){
+
+        List<Contacts> contacts = cusService.getContactsByCusId(customerId);
+        return contacts;
+    }
+
+    @RequestMapping("/createContact.do")
+    public void doCreateContact(HttpSession session,HttpServletResponse response,Contacts contact) throws IOException {
+
+        System.out.println("-------contact------" + contact);
+        /*
+            owner: 758c3a06356f560099e3eeaeeba657cb
+            souce: web下载
+            fullname: 张二鸣
+            appellation: 先生
+            job: CFO
+            mphone: 454545454
+            email: zym@qq.com
+            birth: 2021-12-29
+            customerid: 30c261b3a42b423eaadd581df2edd95f
+            description: jsp：pageContext page request response session application config out exception
+            contactsummary: spring：autowire qualified resource value
+            nextcontacttime: 2021-12-28
+            address: 辽宁沈阳
+
+            -------contact------Contacts{id='null', owner='06f5fc056eac41558a964f96daa7f27c', source='null',
+            customerid='30c261b3a42b423eaadd581df2edd95f', fullname='张三鸣', appellation='先生',
+            email='zym@qq.com', mphone='234234234', job='CFO', birth='2021-12-21', createby='null',
+            createtime='null', editby='null', edittime='null',
+            description='jsp:pageContext page request response session application config out exception',
+             contactsummary='1.jdk动态代理 接口实现
+                2. CGLIB动态代理 继承', nextcontacttime='2021-12-15', address='辽宁沈阳'}
+        */
+        User user = (User) session.getAttribute("user");
+        contact.setCreateby(user.getName());
+        boolean success = cusService.createContact(contact);
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Boolean> map = new HashMap<String, Boolean>();
+        map.put("success",success);
+        String json = mapper.writeValueAsString(map);
+        response.getWriter().print(json);
+
+    }
+
 
 
 }

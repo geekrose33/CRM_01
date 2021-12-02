@@ -96,6 +96,31 @@
     select count(*) from tbl_tran
   </select>
 
+<!--
+  查询详细信息 关联user customer contact activity 四个外键
+  由于活动表和联系人表不是必填 所以为了保护主表 设置左外连接
+
+  t.id, u.name as owner, t.money, t.name, t.expectedDate, cu.name as customerId, t.stage, t.type, t.source, a.name as activityId,
+    co.fullname as contactsId, t.createBy, t.createTime, t.editBy, t.editTime, t.description,t. contactSummary,
+    t.nextContactTime
+
+  inner join tbl_contacts as co on t.contactsId = co.id
+    left inner join tbl_ac
+
+-->
+  <select id="selectDetailInfoById" resultMap="BaseResultMap">
+    select
+    <include refid="Tran_User_Cus_Con_Act_List"></include>
+    from tbl_tran t
+    inner join tbl_user u on u.id = t.owner
+    inner join tbl_customer as cu on t.customerId = cu.id
+    left join tbl_contacts as co on t.contactsId = co.id
+    left join tbl_activity as a on t.activityId = a.id
+    where t.id = #{id}
+  </select>
+
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_tran
     where id = #{id,jdbcType=CHAR}

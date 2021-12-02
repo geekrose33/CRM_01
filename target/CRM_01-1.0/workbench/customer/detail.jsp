@@ -121,6 +121,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 		});
 
+		// 刷新联系人列表
+		contactPageList("${customer.id}");
+
 
 		// 添加联系人
 
@@ -128,6 +131,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 			// 自动填充客户名称
 			$("#create-customerName").val("${customer.name}");
+
+			$("#hide-customer-id").val("${customer.id}");
 
 			// 展开模态窗口
 			$("#createContactsModal").modal("show");
@@ -141,14 +146,26 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			$.post(
 					"workbench/cus/createContact.do",
 					{
-						"owner":$.trim($("#create-contactsOwner").val())
+						"owner":$.trim($("#create-contactsOwner").val()),
+						"source":$.trim($("#create-clueSource").val()),
+						"fullname":$.trim($("#create-surname").val()),
+						"appellation":$.trim($("#create-call").val()),
+						"job":$.trim($("#create-job").val()),
+						"mphone":$.trim($("#create-mphone").val()),
+						"email":$.trim($("#create-email").val()),
+						"birth":$.trim($("#create-birth").val()),
+						"customerid":$.trim($("#hide-customer-id").val()),
+						"description":$.trim($("#create-describe").val()),
+						"contactsummary":$.trim($("#create-contactSummary").val()),
+						"nextcontacttime":$.trim($("#create-nextContactTime").val()),
+						"address":$.trim($("#create-address").val())
 					},
 					function (data) {
 						if (data.success){
 							// 刷新添加 输入框
 
 							// 刷新列表
-
+							contactPageList("${customer.id}");
 							// 关闭模态窗口
 							$("#createContactsModal").modal("hide");
 						}else{
@@ -178,6 +195,34 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		getCusRemark("${param.id}");
 
 	});
+	// 刷新联系人
+	function contactPageList(id){
+
+		$.get(
+				"workbench/cus/getContactsByCusId.do",
+				{
+					"customerId":id
+				},
+				function (data) {
+					// contacts
+					var html = "";
+					$.each(data,function (index,value) {
+						html += '<tr>';
+						html += '<td><a href="contacts/detail.jsp" style="text-decoration: none;">'+value.fullname + value.appellation+'</a></td>';
+						html += '<td>'+value.email+'</td>';
+						html += '<td>'+value.mphone+'</td>';
+						html += '<td><a href="javascript:void(0);" onclick="removeContact(\''+value.id+'\')" style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>删除</a></td>';
+						html += '</tr>';
+
+					});
+					$("#cus-contact-list").html(html);
+
+				},
+				"json"
+		)
+
+	}
+
 	/*
 		动态生成的标签内容 不能直接绑定事件...
 	*/
@@ -389,15 +434,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
                         <div style="position: relative;top: 15px;">
                             <div class="form-group">
-                                <label for="edit-contactSummary" class="col-sm-2 control-label">联系纪要</label>
+                                <label for="create-contactSummary" class="col-sm-2 control-label">联系纪要</label>
                                 <div class="col-sm-10" style="width: 81%;">
-                                    <textarea class="form-control" rows="3" id="edit-contactSummary"></textarea>
+                                    <textarea class="form-control" rows="3" id="create-contactSummary"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="edit-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
+                                <label for="create-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
                                 <div class="col-sm-10" style="width: 300px;">
-                                    <input type="text" class="form-control time" id="edit-nextContactTime">
+                                    <input type="text" class="form-control time" id="create-nextContactTime">
                                 </div>
                             </div>
                         </div>
@@ -406,9 +451,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
                         <div style="position: relative;top: 20px;">
                             <div class="form-group">
-                                <label for="edit-address1" class="col-sm-2 control-label">详细地址</label>
+                                <label for="create-address" class="col-sm-2 control-label">详细地址</label>
                                 <div class="col-sm-10" style="width: 81%;">
-                                    <textarea class="form-control" rows="1" id="edit-address1"></textarea>
+                                    <textarea class="form-control" rows="1" id="create-address"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -718,13 +763,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<td></td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
+					<tbody id="cus-contact-list">
+						<%--<tr>
 							<td><a href="contacts/detail.jsp" style="text-decoration: none;">李四</a></td>
 							<td>lisi@bjpowernode.com</td>
 							<td>13543645364</td>
 							<td><a href="javascript:void(0);" id="remove-contact-btn" style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>删除</a></td>
-						</tr>
+						</tr>--%>
 					</tbody>
 				</table>
 			</div>

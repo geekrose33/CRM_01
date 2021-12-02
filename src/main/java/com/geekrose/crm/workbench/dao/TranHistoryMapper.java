@@ -2,6 +2,8 @@ package com.geekrose.crm.workbench.dao;
 
 import com.geekrose.crm.workbench.domain.TranHistory;
 
+import java.util.List;
+
 public interface TranHistoryMapper {
     int deleteByPrimaryKey(String id);
 
@@ -14,4 +16,6 @@ public interface TranHistoryMapper {
     int updateByPrimaryKeySelective(TranHistory record);
 
     int updateByPrimaryKey(TranHistory record);
+
+    List<TranHistory> selectByTranId(String tranId);
 }

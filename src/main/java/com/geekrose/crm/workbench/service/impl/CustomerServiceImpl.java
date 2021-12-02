@@ -113,9 +113,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     public Contacts getContactByCusId(String id) {
 
-        Contacts contact = conDao.getContactByCusId(id);
+        List<Contacts> contacts = conDao.getContactsByCusId(id);
 
-        return contact;
+
+        return contacts.get(0);
     }
 
     public List<CustomerRemark> getRemarksByCusId(String id) {
@@ -158,6 +159,25 @@ public class CustomerServiceImpl implements CustomerService {
         if (count == 1){
             return true;
         }
+        return false;
+    }
+
+    public List<Contacts> getContactsByCusId(String customerId) {
+
+        List<Contacts> list = conDao.getContactsByCusId(customerId);
+
+        return list;
+    }
+    @Transactional
+    public boolean createContact(Contacts contact) {
+
+        contact.setCreatetime(DateTimeUtil.getSysTime());
+        contact.setId(UUIDUtil.getUUID());
+        int count = conDao.insertSelective(contact);
+        if (count == 1){
+            return true;
+        }
+
         return false;
     }
 }

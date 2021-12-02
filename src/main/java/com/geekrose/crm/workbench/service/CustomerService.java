@@ -28,4 +28,8 @@ public interface CustomerService {
     boolean removeCusRemark(String id);
 
     boolean addRemark(CustomerRemark remark);
+
+    List<Contacts> getContactsByCusId(String customerId);
+
+    boolean createContact(Contacts contact);
 }

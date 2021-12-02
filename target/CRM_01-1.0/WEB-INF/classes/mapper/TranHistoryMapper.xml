@@ -19,6 +19,15 @@
     from tbl_tran_history
     where id = #{id,jdbcType=CHAR}
   </select>
+
+<!--  根据交易id获取交易历史集合-->
+  <select id="selectByTranId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from tbl_tran_history
+    where tranId = #{tranId}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_tran_history
     where id = #{id,jdbcType=CHAR}

@@ -37,6 +37,30 @@ public class Contacts {
 
     private String address;
 
+    @Override
+    public String toString() {
+        return "Contacts{" +
+                "id='" + id + '\'' +
+                ", owner='" + owner + '\'' +
+                ", source='" + source + '\'' +
+                ", customerid='" + customerid + '\'' +
+                ", fullname='" + fullname + '\'' +
+                ", appellation='" + appellation + '\'' +
+                ", email='" + email + '\'' +
+                ", mphone='" + mphone + '\'' +
+                ", job='" + job + '\'' +
+                ", birth='" + birth + '\'' +
+                ", createby='" + createby + '\'' +
+                ", createtime='" + createtime + '\'' +
+                ", editby='" + editby + '\'' +
+                ", edittime='" + edittime + '\'' +
+                ", description='" + description + '\'' +
+                ", contactsummary='" + contactsummary + '\'' +
+                ", nextcontacttime='" + nextcontacttime + '\'' +
+                ", address='" + address + '\'' +
+                '}';
+    }
+
     public String getId() {
         return id;
     }

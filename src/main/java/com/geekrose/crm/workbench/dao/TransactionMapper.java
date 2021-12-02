@@ -23,4 +23,6 @@ public interface TransactionMapper {
     List<Transaction> getTransByCondition(@Param("tran") Transaction tran, @Param("skipCount") Integer skipCount,@Param("pageSize") Integer ipageSize);
 
     int selectCount();
+
+    Transaction selectDetailInfoById(String id);
 }

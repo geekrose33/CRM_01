@@ -3,16 +3,15 @@ package com.geekrose.crm.workbench.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geekrose.crm.settings.domain.User;
 import com.geekrose.crm.utils.DateTimeUtil;
-import com.geekrose.crm.workbench.domain.Activity;
-import com.geekrose.crm.workbench.domain.Contacts;
-import com.geekrose.crm.workbench.domain.Customer;
-import com.geekrose.crm.workbench.domain.Transaction;
+import com.geekrose.crm.workbench.domain.*;
 import com.geekrose.crm.workbench.service.ClueService;
 import com.geekrose.crm.workbench.service.ContactsService;
 import com.geekrose.crm.workbench.service.TransactionService;
+import javafx.beans.binding.ObjectExpression;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -173,7 +172,48 @@ public class TranController {
 
     }
 
+    // 详情页
+    @RequestMapping("/detail.do")
+    public ModelAndView doDetail(String id){
 
+        ModelAndView mv = new ModelAndView();
+        Transaction transaction = tranService.getDetailInfoById(id);
 
+        mv.addObject("tran",transaction);
+        mv.setViewName("forward:/workbench/transaction/detail.jsp");
+
+        return mv;
+    }
+
+    @RequestMapping("/getHisListByTranId.do")
+    @ResponseBody
+    public List<TranHistory> doGetHisListByTranId(String tranId){
+
+        List<TranHistory> list = tranService.getHisListByTranId(tranId);
+        return list;
+    }
+
+    @RequestMapping("/changeStage.do")
+    public void doChangeStage(HttpServletResponse response,HttpSession session,Transaction transaction) throws IOException {
+        User user = (User) session.getAttribute("user");
+        transaction.setEditby(user.getName());
+        boolean success = tranService.changeStage(transaction);
+        // 修改成功返回一个交易对象 封住那所需信息
+        Transaction tran = null;
+        if (success){
+            //  java.lang.NullPointerException
+            tran = new Transaction();
+            tran.setEdittime(DateTimeUtil.getSysTime());
+            tran.setEditby(user.getName());
+            tran.setStage(transaction.getStage());
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("success",success);
+        map.put("tran",tran);
+        String jsons = mapper.writeValueAsString(map);
+        response.getWriter().print(jsons);
+    }
 
 }

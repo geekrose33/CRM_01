@@ -47,6 +47,13 @@
     where customerId = #{cusId}
   </select>
 
+  <select id="getContactsByCusId" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_contacts
+    where customerId = #{cusId}
+    order by createTime desc
+  </select>
+
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tbl_contacts

@@ -21,4 +21,6 @@ public interface ContactsMapper {
     List<Contacts> getContactByName(/*@Param("name") */String name);
 
     Contacts getContactByCusId(String cusId);
+
+    List<Contacts> getContactsByCusId(String customerId);
 }
