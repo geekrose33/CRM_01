@@ -1,12 +1,12 @@
 # CRM_readme
 
-还在更新ing...
+还在更新ing...（已完成基本结构 市场活动模块、联系人模块、客户模块、线索模块、交易模块、统计图表）
 
 使用的技术：maven git
 
 前端原型：搭建的html页面
 
-前端：Bootstrap（UI）+ jQuery
+前端：Bootstrap（UI）+ jQuery（jsp）
 
 后端：SpringMVC + Spring + Mybatis 框架
 
@@ -488,6 +488,34 @@ data-target="#createActivityModal" 表示具体打开哪个模态窗口 根据#i
 > 我使用forEach 获取其中的dom对象，由于dom对象不能使用val()方法，我再使用$(domObj)将其转化为jquery对象使用 val() 方法获取value属性存储的activityid
 
 SpringMVC在接收时使用注解@RequestParam（value=“xxx[]”）形式接收
+### 八、线索转换
 
 
+
+### 九、交易模块
+
+难点分析：
+
+1. 在处理阶段和可能性时，设置的是随着阶段的选择，可能性显示不同的成功概率
+
+实现步骤：
+
+1. 由于这种两种属性直接的对应关系，数据量很小 类似键值对，不适合存储在数据库中，适合按照properties属性文件形式存储
+2. 在监听器（服务器刚启动时存储在服务器缓存中ServletContext上下文域对象）
+3. 使用ResourceBundle解析为 rb对象，调用api 获取键值
+4. 存储为pMap（Map<String,String>）存储到缓存
+5. 在前台获取（通过java脚本），赋给json
+6. 由于是随着阶段变化 可能性改变，所以为其绑定事件方式为change()方法
+7. 在其中获取json的value，以前使用json的value是直接通过json.key形式，而阶段属性是变化的不是以前一样固定的，所以获取value通过json[key]形式获取
+
+### 十、Echars图表
+
+使用目的：数据可视化、数据分布清晰
+
+使用步骤：
+
+1. 引入Echars依赖
+2. 创建容纳图表的dom容器
+3. 分析模板所需数据
+4. 从后台取出数据
 
