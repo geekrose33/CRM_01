@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joker_Dong
@@ -214,6 +215,15 @@ public class TranController {
         map.put("tran",tran);
         String jsons = mapper.writeValueAsString(map);
         response.getWriter().print(jsons);
+    }
+
+    @RequestMapping("/getChars.do")
+    @ResponseBody
+    public Map<String,Object> doGetChars(){
+
+        Map<String,Object> map = tranService.getChars();
+        return map;
+
     }
 
 }

@@ -7,6 +7,7 @@ import com.geekrose.crm.workbench.domain.TranHistory;
 import com.geekrose.crm.workbench.domain.Transaction;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TransactionService {
     List<Transaction> getTranList(Transaction tran, String pageNo, String pageSize);
@@ -34,4 +35,6 @@ public interface TransactionService {
     List<TranHistory> getHisListByTranId(String tranId);
 
     boolean changeStage(Transaction transaction);
+
+    Map<String, Object> getChars();
 }

@@ -4,6 +4,7 @@ import com.geekrose.crm.workbench.domain.Transaction;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TransactionMapper {
     int deleteByPrimaryKey(String id);
@@ -25,4 +26,6 @@ public interface TransactionMapper {
     int selectCount();
 
     Transaction selectDetailInfoById(String id);
+
+    List<Map<String, Object>> getStageChars();
 }

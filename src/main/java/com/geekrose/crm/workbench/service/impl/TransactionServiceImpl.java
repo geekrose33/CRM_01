@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Joker_Dong
@@ -275,5 +273,17 @@ public class TransactionServiceImpl implements TransactionService {
             }
         }
         return flag;
+    }
+
+    public Map<String, Object> getChars() {
+
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        int totalCount = tranDao.selectCount();
+        List<Map<String,Object>> maps = tranDao.getStageChars();
+
+        map.put("total",totalCount);
+        map.put("dataList",maps);
+
+        return map;
     }
 }
